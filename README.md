@@ -1,34 +1,13 @@
-# stock-js-game-electron
+# Stonk-balatro
 
-An Electron application with React and TypeScript
+## Naming
 
-## Recommended IDE Setup
+You will probably see other names throughout the project... they are all equally correct and incorrect.
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+## Tech
 
-## Project Setup
+Currently running electron + vite + typescript.
 
-### Install
+## Troubleshooting
 
-```bash
-$ npm install
-```
-
-### Development
-
-```bash
-$ npm run dev
-```
-
-### Build
-
-```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
-```
+- If you're working on multithreading via web workers and your changes are not reflected, you might need to run `npm build` or `npm start` to force it to build once.
