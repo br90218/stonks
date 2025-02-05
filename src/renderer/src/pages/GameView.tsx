@@ -1,5 +1,6 @@
 import { BuyPanel } from '@renderer/components/BuyPanel';
 import { StockChartPanel } from '@renderer/components/StockChartPanel';
+import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
 import { useEffect, useState } from 'react';
 
 export function GameView() {
@@ -22,6 +23,7 @@ export function GameView() {
             {result}
             <StockChartPanel />
             <BuyPanel />
+            <StockInfoPanel />
         </>
     );
 }
