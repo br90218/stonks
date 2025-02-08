@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface StockInfo {
     name: string;
@@ -7,9 +7,9 @@ interface StockInfo {
 }
 
 export function StockInfoButton(props: StockInfo) {
-    const [name, setName] = useState(props.name);
-    const [price, setPrice] = useState(props.price);
-    const [delta, setDelta] = useState(props.delta);
+    const name = useState(props.name)[0];
+    const price = useState(props.price)[0];
+    const delta = useState(props.delta)[0];
 
     return (
         <button className="stock-info-button">

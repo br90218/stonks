@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 export function BuyPanel() {
-    const [stockName, setStockName] = useState('NVDA');
+    const stockName = useState('NVDA')[0];
 
     return (
         <div id="buy-panel">
