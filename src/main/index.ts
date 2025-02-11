@@ -4,8 +4,17 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { fork } from 'child_process';
 import { resolve } from 'path';
+import { io, Socket } from 'socket.io-client';
 
-function createWindow(): void {
+const stockEngineChild = fork(resolve(__dirname, 'stockEngine.js'), ['stockEngine']);
+
+async function waitForSocketConnected(socket: Socket) {
+    while (!socket.connected) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+}
+
+function createWindow() {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: 900,
@@ -16,6 +25,7 @@ function createWindow(): void {
         webPreferences: {
             preload: join(__dirname, '../preload/index.js'),
             sandbox: false
+            // contextIsolation: false
         }
     });
 
@@ -35,12 +45,14 @@ function createWindow(): void {
     } else {
         mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
     }
+
+    return mainWindow;
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     // Set app user model id for windows
     electronApp.setAppUserModelId('com.electron');
 
@@ -51,15 +63,50 @@ app.whenReady().then(() => {
         optimizer.watchWindowShortcuts(window);
     });
 
-    // IPC test
-    ipcMain.on('ping', () => console.log('pong'));
+    const socket = io('http://localhost:3333');
 
-    createWindow();
+    const mainWindow = createWindow();
+    mainWindow.webContents.openDevTools();
 
     app.on('activate', function () {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+
+    ipcMain.handle('waitUntilConnected', async () => {
+        //await waitForSocketConnected(socket);
+        //return true;
+    });
+
+    ipcMain.handle('getRunFile', async () => {
+        if (!socket.connected) {
+            console.error('socket is not connected yet');
+            return;
+        }
+        const value = await socket.emitWithAck('get-runfile');
+        return value.response;
+    });
+
+    ipcMain.handle('backendStatus', () => {
+        return socket.connected;
+    });
+
+    socket.on('message', (type, value) => {
+        //console.log(`received message of type ${type}, value ${value}`);
+        mainWindow.webContents.send('stockinfo', value);
+    });
+
+    socket.on('connect', () => {
+        console.log('socket is connected');
+        mainWindow.webContents.send('backendStatus', 'connected');
+    });
+
+    socket.on('disconnected', () => {
+        app.quit();
+    });
+    socket.on('connect-error', () => {
+        app.quit();
     });
 });
 
@@ -74,18 +121,3 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
-
-function call(): void {
-    const child = fork(resolve(__dirname, 'stockEngine.js'), ['stockEngine']);
-    child.on('message', function (message) {
-        console.log(`Message from child: ${message}`);
-    });
-    child.on('close', function (code) {
-        console.log('child process exited with code ' + code);
-    });
-    setTimeout(() => {
-        child.send('ping');
-    }, 2_500);
-}
-
-call();

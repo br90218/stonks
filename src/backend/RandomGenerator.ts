@@ -9,7 +9,32 @@ export class RandomGenerator {
         this.rng = new Random(this.seed);
     }
 
-    generatePosOrNeg() {
+    /**
+     * Generates the direction of the stock (going up or down?)
+     * @returns 1 or -1
+     */
+    generateDirection() {
         return this.rng.bool() ? 1 : -1;
     }
+
+    randomInterval = (functionToInvoke, minDelay, maxDelay) => {
+        let timeout;
+
+        const runInterval = () => {
+            const timeOutFunction = () => {
+                functionToInvoke();
+                runInterval();
+            };
+            const delay = this.rng.int(minDelay, maxDelay);
+            timeout = setTimeout(timeOutFunction, delay);
+        };
+
+        runInterval();
+
+        return {
+            clear() {
+                clearTimeout(timeout);
+            }
+        };
+    };
 }
