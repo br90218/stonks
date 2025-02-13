@@ -1,4 +1,4 @@
-import { Market, StockInfo } from '@renderer/data/Interface';
+import { Portfolio, StockInfo } from '@renderer/data/Interface';
 import { StockInfoButton } from './Buttons/StockInfoButton';
 import { useEffect, useState } from 'react';
 
@@ -33,7 +33,7 @@ function StockButtonList(props: { stockList: { id: string; stock: StockInfo }[] 
     );
 }
 
-export function StockInfoPanel(props: { market?: Market | undefined }) {
+export function StockInfoPanel(props: { market?: Portfolio | undefined }) {
     const [stockList, setStockList] = useState<{ id: string; stock: StockInfo }[]>();
     useEffect(() => {
         const list: { id: string; stock: StockInfo }[] = [];

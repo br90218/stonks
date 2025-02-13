@@ -9,6 +9,6 @@ export interface StockInfo {
     currPrice: number;
 }
 
-export interface Market {
+export interface Portfolio {
     [ticker: string]: StockInfo;
 }

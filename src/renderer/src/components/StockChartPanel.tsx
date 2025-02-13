@@ -1,8 +1,9 @@
+import { Portfolio } from '@renderer/data/Interface';
 import { ApexOptions } from 'apexcharts';
 import { useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
 
-export function StockChartPanel() {
+export function StockChartPanel(props: { market: Portfolio; tickerToShow?: string }) {
     const state = useState({
         series: [
             {

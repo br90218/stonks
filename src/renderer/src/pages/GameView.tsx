@@ -1,11 +1,11 @@
 import { BuyPanel } from '@renderer/components/BuyPanel';
 import { StockChartPanel } from '@renderer/components/StockChartPanel';
 import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
-import { Market, StockInfo } from '@renderer/data/Interface';
+import { Portfolio } from '@renderer/data/Interface';
 import { useEffect, useState } from 'react';
 
 export function GameView(): JSX.Element {
-    const [market, setMarket] = useState<Market>();
+    const [market, setMarket] = useState<Portfolio>();
     useEffect(() => {
         window.api.startStockSim();
     }, []);
@@ -22,7 +22,7 @@ export function GameView(): JSX.Element {
 
     return (
         <>
-            <StockChartPanel />
+            <StockChartPanel market={market} />
             <BuyPanel />
             <StockInfoPanel market={market} />
         </>
