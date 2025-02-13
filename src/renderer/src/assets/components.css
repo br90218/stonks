@@ -1,14 +1,19 @@
 
 /*TODO: I would really love to have a button with inner-rounded borders and transparent back ground*/
 .stock-info-button{
-    border:solid 2px transparent;
-    border-radius: 5px;
+    border:0px transparent;
+    border-radius: 10px;
     background: #223f41;
     font-size: 25px;
     text-align: left;
     color: white;
     font-family: monospace;
     padding: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    height: 100%;
+    overflow: hidden;
+    width: 150px;
 }
 
 .stock-info-button #ticker{

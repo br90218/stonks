@@ -54,19 +54,17 @@ export function StockChartPanel(props: {
         });
     }, []);
 
-    return <div ref={chartContainerRef} />;
+    return <div style={{ width: '100%', height: '100%' }} ref={chartContainerRef} />;
 }
 
 const chartOptions: ChartOptions = {
     layout: {
         background: { type: ColorType.Solid, color: 'black' },
         textColor: 'white',
-        fontSize: 0,
         fontFamily: '',
         attributionLogo: false,
         colorSpace: 'display-p3',
         colorParsers: []
     },
-    width: 800,
-    height: 400
+    autoSize: true
 };

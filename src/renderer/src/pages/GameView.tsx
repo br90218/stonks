@@ -6,6 +6,7 @@ import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
 import { Portfolio } from '@renderer/data/Interface';
 import { useEffect, useState } from 'react';
 import styles from '@renderer/assets/css/gameview.module.css';
+import { InventoryPanel } from '@renderer/components/InventoryPanel';
 
 export function GameView(): JSX.Element {
     const [market, setMarket] = useState<Portfolio>();
@@ -29,9 +30,22 @@ export function GameView(): JSX.Element {
                 <NewsFlashPanel />
             </div>
             <div className={styles.main}>
-                <StockChartPanel market={market} />
-                <BuyPanel />
-                <StockInfoPanel market={market} />
+                <div className={styles.mainLeft}>
+                    <div className={styles.chart}>
+                        <StockChartPanel market={market} />
+                    </div>
+                    <div className={styles.info}>
+                        <StockInfoPanel market={market} />
+                    </div>
+                </div>
+                <div className={styles.mainRight}>
+                    <div className={styles.buypanel}>
+                        <BuyPanel />
+                    </div>
+                    <div className={styles.inventory}>
+                        <InventoryPanel />
+                    </div>
+                </div>
             </div>
             <div className={styles.footer}>
                 <StatusPanel />

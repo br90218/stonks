@@ -1,6 +1,7 @@
 import { Portfolio, StockInfo } from '@renderer/data/Interface';
 import { StockInfoButton } from './Buttons/StockInfoButton';
 import { useEffect, useState } from 'react';
+import styles from '@renderer/assets/css/gameview.module.css';
 
 function StockButtonList(props: { stockList: { id: string; stock: StockInfo }[] | undefined }) {
     const [buttonsList, setButtonsList] = useState<{ id: string; stock: StockInfo }[]>([]);
@@ -15,10 +16,10 @@ function StockButtonList(props: { stockList: { id: string; stock: StockInfo }[] 
     }, [props.stockList]);
 
     return (
-        <ul>
+        <ul style={{ height: '100%', padding: '10px' }}>
             {buttonsList.map((item) => {
                 return (
-                    <li key={item.id}>
+                    <li style={{ float: 'left', height: '100%' }} key={item.id}>
                         <StockInfoButton
                             stock={{
                                 ticker: item.stock.ticker,
@@ -45,9 +46,5 @@ export function StockInfoPanel(props: { market?: Portfolio | undefined }) {
         });
         setStockList(list);
     }, [props.market]);
-    return (
-        <div>
-            <StockButtonList stockList={stockList} />
-        </div>
-    );
+    return <StockButtonList stockList={stockList} />;
 }

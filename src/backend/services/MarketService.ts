@@ -221,69 +221,69 @@ const DefaultMarketPortfolio = function (): Portfolio {
         quantity: 10_000
     } as Stock;
 
-    // stocks['TSMC'] = {
-    //     ticker: 'TSMC',
-    //     name: 'Taiwan Semiconductor Company',
-    //     currPrice: 30,
-    //     tick: 0.1,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['TSMC'] = {
+        ticker: 'TSMC',
+        name: 'Taiwan Semiconductor Company',
+        currPrice: 30,
+        tick: 0.1,
+        quantity: 10_000
+    } as Stock;
 
-    // stocks['AMD'] = {
-    //     ticker: 'AMD',
-    //     name: 'Advanced Micro Devices',
-    //     currPrice: 40,
-    //     tick: 0.1,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['AMD'] = {
+        ticker: 'AMD',
+        name: 'Advanced Micro Devices',
+        currPrice: 40,
+        tick: 0.1,
+        quantity: 10_000
+    } as Stock;
 
-    // stocks['MSFT'] = {
-    //     ticker: 'MSFT',
-    //     name: 'Microsoft',
-    //     currPrice: 50,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['MSFT'] = {
+        ticker: 'MSFT',
+        name: 'Microsoft',
+        currPrice: 50,
+        tick: 0.5,
+        quantity: 10_000
+    } as Stock;
 
-    // stocks['U'] = {
-    //     ticker: 'U',
-    //     name: 'Unity',
-    //     currPrice: 60,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['U'] = {
+        ticker: 'U',
+        name: 'Unity',
+        currPrice: 60,
+        tick: 0.5,
+        quantity: 10_000
+    } as Stock;
 
-    // stocks['WBUY'] = {
-    //     ticker: 'WBUY',
-    //     name: 'Worst Buy',
-    //     currPrice: 70,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['WBUY'] = {
+        ticker: 'WBUY',
+        name: 'Worst Buy',
+        currPrice: 70,
+        tick: 0.5,
+        quantity: 10_000
+    } as Stock;
 
-    // stocks['DUO'] = {
-    //     ticker: 'DUO',
-    //     name: 'DuoLingo',
-    //     currPrice: 80,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['DUO'] = {
+        ticker: 'DUO',
+        name: 'DuoLingo',
+        currPrice: 80,
+        tick: 0.5,
+        quantity: 10_000
+    } as Stock;
 
-    // stocks['ETC'] = {
-    //     ticker: 'ETC',
-    //     name: 'Et Tu Chungus',
-    //     currPrice: 90,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['ETC'] = {
+        ticker: 'ETC',
+        name: 'Et Tu Chungus',
+        currPrice: 90,
+        tick: 0.5,
+        quantity: 10_000
+    } as Stock;
 
-    // stocks['BEEG'] = {
-    //     ticker: 'BEEG',
-    //     name: 'Beeg Beeg Games',
-    //     currPrice: 100,
-    //     tick: 1,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['BEEG'] = {
+        ticker: 'BEEG',
+        name: 'Beeg Beeg Games',
+        currPrice: 100,
+        tick: 1,
+        quantity: 10_000
+    } as Stock;
 
     return stocks;
 };
