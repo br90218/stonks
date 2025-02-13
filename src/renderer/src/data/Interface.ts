@@ -9,6 +9,19 @@ export interface StockInfo {
     currPrice: number;
 }
 
-export interface Market {
+export interface Portfolio {
     [ticker: string]: StockInfo;
+}
+
+export interface StockChartDataCollection {
+    [ticker: string]: StockChartDataSeries;
+}
+
+interface StockChartDataSeries {
+    data: StockChartData[];
+}
+
+interface StockChartData {
+    x: Date;
+    y: number[];
 }

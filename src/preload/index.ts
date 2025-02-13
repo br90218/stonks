@@ -15,6 +15,11 @@ const api = {
             callback(value);
         });
     },
+    onStockChartNewData: (callback): void => {
+        ipcRenderer.on('stockprice', (_event, value) => {
+            callback(value);
+        });
+    },
     getConnectionStatus: () => {
         return ipcRenderer.invoke('backendStatus');
     },

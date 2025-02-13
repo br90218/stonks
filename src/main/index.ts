@@ -30,6 +30,7 @@ function createWindow() {
     });
 
     mainWindow.on('ready-to-show', () => {
+        mainWindow.maximize();
         mainWindow.show();
     });
 
@@ -107,8 +108,7 @@ app.whenReady().then(async () => {
     });
 
     socket.on('message', (event, value) => {
-        //console.log(`received message of type ${type}, value ${value}`);
-        mainWindow.webContents.send('stockinfo', value);
+        mainWindow.webContents.send(event, value);
     });
 
     socket.on('connect', () => {
