@@ -27,6 +27,7 @@ export function BuyStock(
 
     const portfolioStock = runFile.portfolio?.[ticker];
     const marketStock = market[ticker];
+    const updateTime = new Date();
 
     const updatedStock: Stock = {
         ticker: ticker,
@@ -38,7 +39,8 @@ export function BuyStock(
             quantity
         ),
         quantity: portfolioStock ? portfolioStock.quantity + quantity : quantity,
-        tick: marketStock.tick
+        tick: marketStock.tick,
+        lastUpdate: updateTime
     };
 
     const updatedMarketStock: Stock = {
@@ -46,7 +48,8 @@ export function BuyStock(
         name: marketStock.name,
         currPrice: marketStock.currPrice,
         quantity: marketStock.quantity - quantity,
-        tick: marketStock.tick
+        tick: marketStock.tick,
+        lastUpdate: updateTime
     };
 
     runFile.portfolio[ticker] = updatedStock;
@@ -108,7 +111,8 @@ function StockSimulationLoop(rng: RandomGenerator, io: Server, ticker: string, m
                 name: stock.name,
                 currPrice: stock.currPrice + rng.generateDirection() * stock.tick,
                 tick: stock.tick, // TODO: shuld change when price is at a certain threshold
-                quantity: stock.quantity
+                quantity: stock.quantity,
+                lastUpdate: new Date()
             };
             market[stock.ticker] = newStockInfo;
             io.emit('message', 'stockinfo', newStockInfo);
