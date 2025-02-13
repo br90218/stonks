@@ -92,7 +92,21 @@ app.whenReady().then(async () => {
         return socket.connected;
     });
 
-    socket.on('message', (type, value) => {
+    ipcMain.handle('command', (event, command) => {
+        socket.emit(command);
+    });
+
+    ipcMain.handle('request', async (event, message) => {
+        if (!socket.connected) {
+            console.error('socket is not connected yet');
+            return;
+        }
+        const reply = await socket.emitWithAck(message);
+        //console.log(reply);
+        return reply.response;
+    });
+
+    socket.on('message', (event, value) => {
         //console.log(`received message of type ${type}, value ${value}`);
         mainWindow.webContents.send('stockinfo', value);
     });

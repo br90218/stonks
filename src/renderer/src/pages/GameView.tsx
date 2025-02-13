@@ -1,25 +1,30 @@
 import { BuyPanel } from '@renderer/components/BuyPanel';
 import { StockChartPanel } from '@renderer/components/StockChartPanel';
 import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
-import { StockInfo } from '@renderer/data/Interface';
+import { Market, StockInfo } from '@renderer/data/Interface';
 import { useEffect, useState } from 'react';
 
 export function GameView(): JSX.Element {
-    const [stockInfo, setStockInfo] = useState<StockInfo>();
+    const [market, setMarket] = useState<Market>();
     useEffect(() => {
-        window.api.onStockInfoChanged((value) => {
-            setStockInfo({
-                name: value.name,
-                currPrice: parseFloat(value.currPrice)
-            });
-        });
+        window.api.startStockSim();
     }, []);
+
+    useEffect(() => {
+        const timeout = setTimeout(marketInfo, 1000);
+        return (): void => clearTimeout(timeout);
+    }, [market]);
+
+    const marketInfo = async (): void => {
+        const fetched = await window.api.getMarketPortfolio();
+        setMarket(fetched);
+    };
 
     return (
         <>
             <StockChartPanel />
-            <BuyPanel stock={stockInfo} />
-            <StockInfoPanel />
+            <BuyPanel />
+            <StockInfoPanel market={market} />
         </>
     );
 }

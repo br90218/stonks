@@ -1,4 +1,5 @@
 export interface Stock {
+    ticker: string;
     name: string;
     currPrice: number;
     quantity: number; //NOTE: i would actually like to separate SHARE from STOCK. quantity should not be here.
@@ -13,5 +14,5 @@ export interface RunFile {
 }
 
 export interface Portfolio {
-    collection: Stock[];
+    [ticker: string]: Stock;
 }

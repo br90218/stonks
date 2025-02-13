@@ -1,11 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
 
+//TODO: need a better message format convention, it's everywhere.
 // Custom APIs for renderer
 const api = {
     retrieveRunFile: async (): Promise<string> => {
-        const value = await ipcRenderer.invoke('getRunFile');
-        return value;
+        return await ipcRenderer.invoke('request', 'get-runfile');
     },
     waitUntilConnected: async () => {
         return await ipcRenderer.invoke('waitUntilConnected');
@@ -15,8 +15,15 @@ const api = {
             callback(value);
         });
     },
-    getConnectionStatus: (): void => {
+    getConnectionStatus: () => {
         return ipcRenderer.invoke('backendStatus');
+    },
+    startStockSim: () => {
+        console.log('frontend requested start stock sim');
+        return ipcRenderer.invoke('command', 'start-stocksim');
+    },
+    getMarketPortfolio: async () => {
+        return await ipcRenderer.invoke('request', 'get-marketPortfolio');
     },
     onStockInfoChanged: (callback): void => {
         ipcRenderer.on('stockinfo', (_event, value) => {
