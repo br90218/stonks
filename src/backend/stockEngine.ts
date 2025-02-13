@@ -11,6 +11,7 @@ import { RandomGenerator } from './RandomGenerator';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { InstantiateMarket, startAllStockSimulation } from './services/MarketService';
+import { DateService } from './services/DateService';
 
 const app = express();
 const backendServer = createServer(app);
@@ -21,7 +22,6 @@ const io = new Server(backendServer, {
 });
 
 //TODO: magic number 1111
-//TODO: can we object-ify these loops so each of them represent a stock?
 const rng = new RandomGenerator('1111');
 
 let runFile: RunFile | null;
@@ -29,14 +29,15 @@ let runFile: RunFile | null;
 //HACK: new market always
 const market = InstantiateMarket();
 let marketSimLoop: object;
+let dateService: DateService;
 
 function startStockEngine(): void {
-    marketSimLoop = startAllStockSimulation(rng, io, market);
+    dateService = new DateService('2030-01-01');
+    marketSimLoop = startAllStockSimulation(rng, io, market, dateService);
 }
 
 io.on('connection', (socket) => {
     socket.on('get-runfile', (callback): void => {
-        console.log('retrieving runfile... expect only 1');
         runFile = RetrieveRunFile(true);
         callback({
             response: runFile

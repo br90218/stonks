@@ -1,8 +1,11 @@
 import { BuyPanel } from '@renderer/components/BuyPanel';
+import { NewsFlashPanel } from '@renderer/components/NewsFlashPanel';
+import { StatusPanel } from '@renderer/components/StatusPanel';
 import { StockChartPanel } from '@renderer/components/StockChartPanel';
 import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
 import { Portfolio } from '@renderer/data/Interface';
 import { useEffect, useState } from 'react';
+import styles from '@renderer/assets/css/gameview.module.css';
 
 export function GameView(): JSX.Element {
     const [market, setMarket] = useState<Portfolio>();
@@ -21,10 +24,18 @@ export function GameView(): JSX.Element {
     };
 
     return (
-        <>
-            <StockChartPanel market={market} />
-            <BuyPanel />
-            <StockInfoPanel market={market} />
-        </>
+        <div className={styles.gameview}>
+            <div className="header">
+                <NewsFlashPanel />
+            </div>
+            <div className="main">
+                <StockChartPanel market={market} />
+                <BuyPanel />
+                <StockInfoPanel market={market} />
+            </div>
+            <div className="footer">
+                <StatusPanel />
+            </div>
+        </div>
     );
 }

@@ -28,6 +28,7 @@
         "cors": "^2.8.5",
         "electron-updater": "^6.1.7",
         "express": "^4.21.2",
+        "lightweight-charts": "^5.0.2",
         "random": "^5.1.1",
         "react-router-dom": "^7.1.5",
         "socket.io": "^4.8.1",

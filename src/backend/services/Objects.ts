@@ -6,7 +6,7 @@ export interface Stock {
     currPrice: number;
     quantity: number; //NOTE: i would actually like to separate SHARE from STOCK. quantity should not be here.
     tick: number;
-    lastUpdate: Date;
+    lastUpdate: string;
 }
 
 export interface RunFile {
@@ -29,8 +29,8 @@ export interface StockHistory {
     priceHistory: PriceDataAtTime[];
 }
 
-interface PriceDataAtTime {
-    time: Date;
+export interface PriceDataAtTime {
+    time: string;
     price: OHLC;
 }
 
