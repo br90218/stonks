@@ -1,3 +1,5 @@
+import { Data } from 'electron';
+
 export interface Stock {
     ticker: string;
     name: string;
@@ -16,4 +18,25 @@ export interface RunFile {
 
 export interface Portfolio {
     [ticker: string]: Stock;
+}
+
+export interface MarketHistory {
+    [ticker: string]: StockHistory;
+}
+
+export interface StockHistory {
+    ticker: string;
+    priceHistory: PriceDataAtTime[];
+}
+
+interface PriceDataAtTime {
+    time: Date;
+    price: OHLC;
+}
+
+interface OHLC {
+    open: number;
+    high: number;
+    low: number;
+    close: number;
 }
