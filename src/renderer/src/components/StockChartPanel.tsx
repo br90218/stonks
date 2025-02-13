@@ -3,7 +3,7 @@ import { useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
 
 export function StockChartPanel() {
-    const [state, setState] = useState({
+    const state = useState({
         series: [
             {
                 data: [
@@ -268,7 +268,7 @@ export function StockChartPanel() {
                 }
             }
         }
-    });
+    })[0];
 
     return (
         <div id="chart">

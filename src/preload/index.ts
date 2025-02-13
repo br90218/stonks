@@ -1,22 +1,50 @@
-import { contextBridge } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from 'electron';
+import { electronAPI } from '@electron-toolkit/preload';
 
+//TODO: need a better message format convention, it's everywhere.
 // Custom APIs for renderer
-const api = {}
+const api = {
+    retrieveRunFile: async (): Promise<string> => {
+        return await ipcRenderer.invoke('request', 'get-runfile');
+    },
+    waitUntilConnected: async () => {
+        return await ipcRenderer.invoke('waitUntilConnected');
+    },
+    onConnectionStatusChanged: (callback): void => {
+        ipcRenderer.on('backendStatus', (_event, value) => {
+            callback(value);
+        });
+    },
+    getConnectionStatus: () => {
+        return ipcRenderer.invoke('backendStatus');
+    },
+    startStockSim: () => {
+        console.log('frontend requested start stock sim');
+        return ipcRenderer.invoke('command', 'start-stocksim');
+    },
+    getMarketPortfolio: async () => {
+        return await ipcRenderer.invoke('request', 'get-marketPortfolio');
+    },
+    onStockInfoChanged: (callback): void => {
+        ipcRenderer.on('stockinfo', (_event, value) => {
+            callback(value);
+        });
+    }
+};
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
 if (process.contextIsolated) {
-  try {
-    contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
-  } catch (error) {
-    console.error(error)
-  }
+    try {
+        contextBridge.exposeInMainWorld('electron', electronAPI);
+        contextBridge.exposeInMainWorld('api', api);
+    } catch (error) {
+        console.error(error);
+    }
 } else {
-  // @ts-ignore (define in dts)
-  window.electron = electronAPI
-  // @ts-ignore (define in dts)
-  window.api = api
+    // @ts-ignore (define in dts)
+    window.electron = electronAPI;
+    // @ts-ignore (define in dts)
+    window.api = api;
 }

@@ -1,22 +1,34 @@
-import { useEffect, useState } from 'react';
+import { StockInfo } from '@renderer/data/Interface';
+import { useEffect, useRef, useState } from 'react';
 
-interface StockInfo {
-    name: string;
-    price: number;
-    delta: number;
-}
+export function StockInfoButton(props: { stock: StockInfo | undefined }): JSX.Element {
+    const [stock, setStock] = useState<StockInfo | undefined>(props.stock);
+    const direction = useRef('equal');
+    useEffect(() => {
+        if (!props.stock) {
+            return;
+        }
 
-export function StockInfoButton(props: StockInfo) {
-    const [name, setName] = useState(props.name);
-    const [price, setPrice] = useState(props.price);
-    const [delta, setDelta] = useState(props.delta);
+        //TODO: I kinda want this logic to be handled in the backend
+        if (stock) {
+            if (props.stock.currPrice > stock.currPrice) {
+                direction.current = 'price-up';
+            } else if (props.stock.currPrice == stock.currPrice) {
+                direction.current = 'price-equal';
+            } else {
+                direction.current = 'price-down';
+            }
+        }
 
+        setStock(props.stock);
+    }, [props.stock]);
     return (
         <button className="stock-info-button">
-            <h1>{name}</h1>
-            {price}
-            <br />
-            {delta}
+            <h2 id="ticker">{stock?.ticker}</h2>
+            <div id="name">{stock?.name}</div>
+            <div className={direction.current} id="price">
+                {stock?.currPrice.toFixed(2)}
+            </div>
         </button>
     );
 }

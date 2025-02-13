@@ -169,3 +169,13 @@ code {
     display: none;
   }
 }
+
+@font-face {
+  font-family: 'falling-sky-bold';
+  src: url('./falling-sky-font/FallingSkyBoldplus-6GZ1.otf')
+}
+
+@font-face{
+  font-family: 'falling-sky-regular';
+  src: url('./falling-sky-font/FallingSkyLight-K2EX.otf');
+}

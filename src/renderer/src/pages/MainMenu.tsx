@@ -1,23 +1,31 @@
-import { RetrieveRunFile } from "@renderer/services/SaveFile";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { RunFile } from '@renderer/data/Interface';
+import { PageProp } from './BasicPage';
+import { RetrieveRunFile } from '@renderer/services/BackendUtility';
 
-export function MainMenu() {
+export function MainMenu(props: PageProp): JSX.Element {
+    const [rf, setrf] = useState('');
 
-  function ShowContinueRun()
-  {
-    var div = document.getElementById('continue-run')!;
-    div.style.display = RetrieveRunFile() == false ? "none" : "block";
-  }
+    useEffect(() => {
+        RetrieveRunFile().then((result) => {
+            if (result != null) {
+                setrf(result.name);
+            }
+        });
+    }, []);
 
-  window.onload = ShowContinueRun;
-
-  return(
-      <>
-          <h1>Wall Street Bets</h1>
-          The house always wins..
-          <Link to="/runsettings"><button>New Run</button></Link>
-          <div id="continue-run">A save file is detected</div>
-          <Link to="/settings"><button>Settings</button></Link>
-      </>
-  )
+    return (
+        <>
+            <h1>Wall Street Betssss</h1>
+            The house always winsdddd..
+            <Link to="/runsettings">
+                <button>New Run</button>
+            </Link>
+            <div id="continue-run">A save file is detected: {rf}</div>
+            <Link to="/settings">
+                <button>Settings</button>
+            </Link>
+        </>
+    );
 }
