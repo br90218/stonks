@@ -25,15 +25,15 @@ export function GameView(): JSX.Element {
 
     return (
         <div className={styles.gameview}>
-            <div className="header">
+            <div className={styles.header}>
                 <NewsFlashPanel />
             </div>
-            <div className="main">
+            <div className={styles.main}>
                 <StockChartPanel market={market} />
                 <BuyPanel />
                 <StockInfoPanel market={market} />
             </div>
-            <div className="footer">
+            <div className={styles.footer}>
                 <StatusPanel />
             </div>
         </div>
