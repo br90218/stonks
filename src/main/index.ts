@@ -93,7 +93,6 @@ app.whenReady().then(async () => {
     });
 
     ipcMain.handle('command', (event, command, args) => {
-        console.log(args);
         socket.emit(command, args);
     });
 

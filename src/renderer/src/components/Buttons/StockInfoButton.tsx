@@ -5,7 +5,7 @@ export function StockInfoButton(props: {
     stock: StockInfo | undefined;
     gvCallback: (childData: CallBackMessage) => void;
 }): JSX.Element {
-    const [stock, setStock] = useState<StockInfo>(EmptyStockInfo());
+    const [stock, setStock] = useState<StockInfo>(EmptyStockInfo);
     const [direction, setDirection] = useState('price-equal');
     //TODO: the loop here is wrong. Direction is usually one render slower than actual price move.
     useEffect(() => {

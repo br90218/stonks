@@ -1,24 +1,69 @@
-import { CallBackMessage, EmptyStockInfo, StockInfo } from '@renderer/data/Interface';
+import {
+    CallBackMessage,
+    EmptyPortfolio,
+    EmptyStockInfo,
+    Portfolio,
+    StockInfo
+} from '@renderer/data/Interface';
 import styles from '@renderer/assets/css/buypanel.module.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function BuyPanel(props: {
     tickerToShow: string;
-    stockInfo: StockInfo | undefined;
+    marketStockInfo: StockInfo | undefined;
+    playerStockPortfolio: Portfolio | undefined;
     gvCallback: (childData: CallBackMessage) => void;
 }): JSX.Element {
-    const [stock, setStock] = useState<StockInfo>(EmptyStockInfo());
+    const [marketStockInfo, setMarketStockInfo] = useState<StockInfo>(EmptyStockInfo);
+    const [playerStockInfoToDisplay, setPlayerStockInfoToDisplay] =
+        useState<StockInfo>(EmptyStockInfo);
+    const gvCallback = useRef(props.gvCallback);
+    const tickerShown = useRef('NVDA');
+
     useEffect(() => {
-        if (props.tickerToShow == props.stockInfo?.ticker) {
-            setStock(props.stockInfo);
+        if (props.tickerToShow == props.marketStockInfo?.ticker) {
+            setMarketStockInfo(props.marketStockInfo);
         }
-    }, [props.tickerToShow, props.stockInfo]);
+        if (props.tickerToShow && props.tickerToShow != '') {
+            tickerShown.current = props.tickerToShow;
+        }
+    }, [props.tickerToShow, props.marketStockInfo]);
+
+    useEffect(() => {
+        if (props.playerStockPortfolio && marketStockInfo) {
+            Object.keys(props.playerStockPortfolio).forEach((ticker) => {
+                console.log(marketStockInfo.ticker);
+                if (ticker == tickerShown.current) {
+                    setPlayerStockInfoToDisplay(props.playerStockPortfolio![ticker]);
+                } else {
+                    setPlayerStockInfoToDisplay(EmptyStockInfo);
+                }
+            });
+        }
+    }, [props.playerStockPortfolio]);
 
     function buyStock(quantity: number): void {
-        if (stock) {
-            props.gvCallback({
+        if (marketStockInfo) {
+            gvCallback.current({
                 msgType: 'buyStock',
-                arg: [stock.ticker, stock.currPrice.toFixed(2), quantity.toString()]
+                arg: [
+                    marketStockInfo.ticker,
+                    marketStockInfo.currPrice.toFixed(2),
+                    quantity.toString()
+                ]
+            });
+        }
+    }
+
+    function sellStock(quantity: number): void {
+        if (marketStockInfo) {
+            gvCallback.current({
+                msgType: 'sellStock',
+                arg: [
+                    marketStockInfo.ticker,
+                    marketStockInfo.currPrice.toFixed(2),
+                    quantity.toString()
+                ]
             });
         }
     }
@@ -27,11 +72,11 @@ export function BuyPanel(props: {
         <div className={styles.buyPanel}>
             <div className={styles.upperPane}>
                 <div className={styles.stockInfo}>
-                    <h1>{stock.ticker}</h1>
-                    <p>{stock.name}</p>
+                    <h1>{marketStockInfo.ticker}</h1>
+                    <p>{marketStockInfo.name}</p>
                 </div>
                 <div className={styles.priceInfo}>
-                    <h1>{stock.currPrice.toFixed(2)}</h1>
+                    <h1>{marketStockInfo.currPrice.toFixed(2)}</h1>
                 </div>
             </div>
             <div className={styles.lowerPane}>
@@ -42,13 +87,13 @@ export function BuyPanel(props: {
                     <button onClick={() => buyStock(100)}>100</button>
                 </div>
                 <div className={styles.portfolioColumn}>
-                    <h1>Shares: 1000</h1>
+                    <h1>Shares: {playerStockInfoToDisplay.quantity}</h1>
                 </div>
                 <div className={styles.sellColumn}>
                     <h1>Sell</h1>
-                    <button>1</button>
-                    <button>10</button>
-                    <button>100</button>
+                    <button onClick={() => sellStock(1)}>1</button>
+                    <button onClick={() => sellStock(10)}>10</button>
+                    <button onClick={() => sellStock(100)}>100</button>
                 </div>
             </div>
             <br />

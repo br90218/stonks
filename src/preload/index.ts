@@ -42,8 +42,21 @@ const api = {
             Number(quantity)
         ]);
     },
-    getMarketPortfolio: async () => {
-        return await ipcRenderer.invoke('request', 'get-marketPortfolio');
+    sellStock: async (ticker: string, price: string, quantity: string) => {
+        return await ipcRenderer.invoke('request', 'sell-stock', [
+            ticker,
+            Number(price),
+            Number(quantity)
+        ]);
+    },
+    getMarketStock: async (tickers?: string[]) => {
+        return await ipcRenderer.invoke('request', 'get-marketStock', tickers);
+    },
+    getPlayerStock: async (tickers?: string[]) => {
+        return await ipcRenderer.invoke('request', 'get-playerStock', tickers);
+    },
+    setStockInfluence: (args): Promise<void> => {
+        return ipcRenderer.invoke('command', 'set-stock-influence', [args[0], Number(args[1])]);
     }
 };
 

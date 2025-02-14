@@ -10,12 +10,18 @@ export interface StockInfo {
     delta: number;
     deltaPercentage: number;
     lastDelta: number;
+    quantity: number;
 }
 
 export interface Portfolio {
     [ticker: string]: StockInfo;
 }
 
+export const EmptyPortfolio = (): Portfolio => {
+    return {};
+};
+
+//TODO this needs a better name, or needs to be restructured with Portfolio.
 export interface UserPortfolio {
     cash: number;
     portfolio: Portfolio;
@@ -45,16 +51,17 @@ export function LoadingStockInfo(): StockInfo {
     return stockInfo;
 }
 
-export function EmptyStockInfo(): StockInfo {
+export const EmptyStockInfo = (): StockInfo => {
     return {
         ticker: 'N/A',
         name: 'No Stock Selected',
         currPrice: 0,
         delta: 0,
         deltaPercentage: 0,
-        lastDelta: 0
+        lastDelta: 0,
+        quantity: 0
     };
-}
+};
 
 export function EmptyUserPortfolio(): UserPortfolio {
     return {
@@ -62,3 +69,15 @@ export function EmptyUserPortfolio(): UserPortfolio {
         portfolio: {}
     };
 }
+
+export interface StockOperationResponse {
+    newCash: number;
+    operatedStock: StockInfo;
+}
+
+export const EmptyStockOperationResponse = (): StockOperationResponse => {
+    return {
+        newCash: 0,
+        operatedStock: EmptyStockInfo()
+    };
+};

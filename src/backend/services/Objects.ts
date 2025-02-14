@@ -10,6 +10,7 @@ export interface Stock {
     lastDelta?: number;
     tick: number;
     lastUpdate: string;
+    directionInfluence: number;
 }
 
 export interface RunFile {
@@ -47,8 +48,16 @@ interface OHLC {
 export interface StockOperationResponse {
     result: boolean;
     detail: string;
-    file?: {
-        cash: number;
+    data?: {
+        newRemainingCash: number;
+        stock: Stock;
+    };
+}
+
+export interface StockGetResponse {
+    result: boolean;
+    detail: string;
+    data?: {
         portfolio: Portfolio;
     };
 }

@@ -13,8 +13,9 @@ export class RandomGenerator {
      * Generates the direction of the stock (going up or down?)
      * @returns 1 or -1
      */
-    generateDirection() {
-        return this.rng.bool() ? 1 : -1;
+    generateDirection(influence = 0.5): number {
+        const ref = this.rng.float(0, 1);
+        return ref <= influence ? 1 : -1;
     }
 
     randomInterval = (functionToInvoke, minDelay, maxDelay) => {

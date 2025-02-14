@@ -5,16 +5,25 @@ import {
     SaveRunFile
 } from './services/SaveFileService';
 
-import express, { Express } from 'express';
-//TODO: investigate what cors really does to maximize inter-process security.
+import express from 'express';
 import { RandomGenerator } from './RandomGenerator';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
-import { BuyStock, InstantiateMarket, startAllStockSimulation } from './services/MarketService';
+import {
+    AddInfluenceToStock,
+    BuyStock,
+    GetMarketStock,
+    GetPlayerStock,
+    InstantiateMarket,
+    SellStock,
+    startAllStockSimulation
+} from './services/MarketService';
 import { DateService } from './services/DateService';
 
 const app = express();
 const backendServer = createServer(app);
+
+//TODO: investigate what cors really does
 const io = new Server(backendServer, {
     cors: {
         origin: 'http://localhost:5173'
@@ -45,8 +54,16 @@ io.on('connection', (socket) => {
     });
 
     socket.on('buy-stock', (args, callback): void => {
-        console.log('bbb');
+        //This should only return the updated / bought stock
         const result = BuyStock(runFile, market, dateService, args[0], args[1], args[2]);
+        callback({
+            response: result
+        });
+    });
+
+    socket.on('sell-stock', (args, callback): void => {
+        //This should only return the updated / bought stock
+        const result = SellStock(runFile, market, dateService, args[0], args[1], args[2]);
         callback({
             response: result
         });
@@ -55,6 +72,22 @@ io.on('connection', (socket) => {
     socket.on('get-marketPortfolio', (args, callback): void => {
         callback({
             response: market
+        });
+    });
+
+    socket.on('set-stock-influence', (args): void => {
+        AddInfluenceToStock(market, args[0], args[1]);
+    });
+
+    socket.on('get-marketStock', (args, callback): void => {
+        callback({
+            response: GetMarketStock(market, args)
+        });
+    });
+
+    socket.on('get-playerStock', (args, callback): void => {
+        callback({
+            response: GetPlayerStock(runFile, args)
         });
     });
 

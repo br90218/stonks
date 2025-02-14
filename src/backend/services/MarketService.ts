@@ -5,10 +5,66 @@ import {
     Portfolio,
     PriceDataAtTime,
     Stock,
+    StockGetResponse,
     StockOperationResponse
 } from './Objects';
 import { RunFile } from './Objects';
 import { DateService } from './DateService';
+
+export function GetMarketStock(marketPortfolio: Portfolio, tickers?: string[]): StockGetResponse {
+    if (tickers && tickers.length > 0) {
+        const result: Portfolio = {};
+        tickers.forEach((ticker) => {
+            if (ticker != '') {
+                result[ticker] = marketPortfolio[ticker];
+            }
+        });
+        return {
+            result: true,
+            detail: 'ok',
+            data: { portfolio: result }
+        };
+    }
+    const portfolio = marketPortfolio;
+    return {
+        result: true,
+        detail: 'ok',
+        data: { portfolio: portfolio }
+    };
+}
+
+export function GetPlayerStock(runFile: RunFile, tickers?: string[]): StockGetResponse {
+    if (!runFile.portfolio) {
+        console.log('1');
+        return {
+            result: true,
+            detail: 'ok',
+            data: { portfolio: {} }
+        };
+    }
+    if (tickers && tickers.length > 0) {
+        console.log(runFile.portfolio);
+        console.log('2');
+        const result: Portfolio = {};
+        tickers.forEach((ticker) => {
+            if (ticker != '') {
+                result[ticker] = runFile.portfolio![ticker];
+            }
+        });
+        return {
+            result: true,
+            detail: 'ok',
+            data: { portfolio: result }
+        };
+    }
+    console.log('3');
+    const portfolio = runFile.portfolio;
+    return {
+        result: true,
+        detail: 'ok',
+        data: { portfolio: portfolio }
+    };
+}
 
 export function BuyStock(
     runFile: RunFile,
@@ -37,20 +93,20 @@ export function BuyStock(
     // it also means that orders will be fulfilled regardless
     // of the quoted price.
 
-    const portfolioStock = runFile.portfolio[ticker];
+    const currentUserStock = runFile.portfolio[ticker];
     const marketStock = market[ticker];
     const updateTime = dateService.ParseDate();
 
-    const updatedStock: Stock = {
+    const updatedUserStock: Stock = {
         ticker: ticker,
-        name: portfolioStock ? portfolioStock.name : marketStock.name,
+        name: currentUserStock ? currentUserStock.name : marketStock.name,
         currPrice: calculateAveragePrice(
-            portfolioStock ? portfolioStock.currPrice : 0,
-            portfolioStock ? portfolioStock.quantity : 0,
+            currentUserStock ? currentUserStock.currPrice : 0,
+            currentUserStock ? currentUserStock.quantity : 0,
             price,
             quantity
         ),
-        quantity: portfolioStock ? portfolioStock.quantity + quantity : quantity,
+        quantity: currentUserStock ? currentUserStock.quantity + quantity : quantity,
         tick: marketStock.tick,
         lastUpdate: updateTime
     };
@@ -66,14 +122,75 @@ export function BuyStock(
         lastDelta: marketStock.lastDelta,
         lastUpdate: updateTime
     };
-    runFile.portfolio[ticker] = updatedStock;
+    runFile.portfolio[ticker] = updatedUserStock;
     marketStock[ticker] = updatedMarketStock;
     runFile.cash -= quantity * price;
 
     return {
         result: true,
         detail: 'ok',
-        file: { cash: runFile.cash, portfolio: runFile.portfolio }
+        data: { newRemainingCash: runFile.cash, stock: updatedUserStock }
+    };
+}
+
+export function SellStock(
+    runFile: RunFile,
+    market: Portfolio,
+    dateService: DateService,
+    ticker: string,
+    price: number,
+    quantity: number
+): StockOperationResponse {
+    if (!runFile || !runFile.portfolio) {
+        console.error(
+            `did not supply runFile or runFile portfolio does not exist when selling stock`
+        );
+        return { result: false, detail: 'runFile-error' };
+    }
+    if (!market || !dateService) {
+        console.error(`did not supply market or dateService when selling stock`);
+        return { result: false, detail: 'internal-error' };
+    }
+
+    const portfolioStock = runFile.portfolio[ticker];
+
+    if (!portfolioStock || portfolioStock.quantity < quantity) {
+        return { result: false, detail: 'insufficient-stock' };
+    }
+
+    const marketStock = market[ticker];
+    const updateTime = dateService.ParseDate();
+
+    const updatedUserStock: Stock = {
+        ticker: ticker,
+        name: portfolioStock.name,
+        currPrice: portfolioStock.currPrice,
+        quantity: portfolioStock.quantity - quantity,
+        tick: marketStock.tick,
+        lastUpdate: updateTime
+    };
+
+    console.log(portfolioStock.quantity - quantity);
+
+    const updatedMarketStock: Stock = {
+        ticker: marketStock.ticker,
+        name: marketStock.name,
+        currPrice: marketStock.currPrice,
+        quantity: marketStock.quantity + quantity,
+        tick: marketStock.tick,
+        delta: marketStock.delta,
+        deltaPercentage: marketStock.deltaPercentage,
+        lastDelta: marketStock.lastDelta,
+        lastUpdate: updateTime
+    };
+    runFile.portfolio[ticker] = updatedUserStock;
+    marketStock[ticker] = updatedMarketStock;
+    runFile.cash += quantity * price;
+
+    return {
+        result: true,
+        detail: 'ok',
+        data: { newRemainingCash: runFile.cash, stock: updatedUserStock }
     };
 }
 
@@ -132,6 +249,13 @@ export function stopStockSimulation(stockSimulationLoops: object, ticker: string
     return stockSimulationLoops;
 }
 
+export function AddInfluenceToStock(market: Portfolio, ticker: string, influence: number): void {
+    const newStock = ReturnStockCopy(market[ticker]);
+    newStock.directionInfluence = Math.max(0, Math.min(newStock.directionInfluence + influence, 1));
+    console.log(newStock.directionInfluence);
+    market[ticker] = newStock;
+}
+
 function StockSimulationLoop(
     rng: RandomGenerator,
     io: Server,
@@ -144,7 +268,12 @@ function StockSimulationLoop(
         () => {
             const stock = market[ticker];
             const currPrice = stock.currPrice;
-            const newPrice = stock.currPrice + rng.generateDirection() * stock.tick;
+            const newPrice = GenerateNewPrice(
+                stock.currPrice,
+                rng,
+                stock.tick,
+                stock.directionInfluence
+            );
             const date = dateService.ParseDate();
 
             history[stock.ticker].priceHistory = AddNewPriceData(
@@ -161,17 +290,12 @@ function StockSimulationLoop(
             const percentage = delta / openPrice;
             const lastDelta = newPrice - currPrice;
 
-            const newStockInfo: Stock = {
-                ticker: stock.ticker,
-                name: stock.name,
-                currPrice: newPrice,
-                delta: delta,
-                deltaPercentage: percentage,
-                lastDelta: lastDelta,
-                tick: stock.tick, // TODO: shuld change when price is at a certain threshold
-                quantity: stock.quantity,
-                lastUpdate: date
-            };
+            const newStockInfo = ReturnStockCopy(stock);
+            newStockInfo.currPrice = newPrice;
+            newStockInfo.delta = delta;
+            newStockInfo.deltaPercentage = percentage;
+            newStockInfo.lastDelta = lastDelta;
+            newStockInfo.lastUpdate = date;
 
             market[stock.ticker] = newStockInfo;
             io.emit('message', 'stockinfo', { ticker: stock.ticker, data: newStockInfo });
@@ -179,6 +303,15 @@ function StockSimulationLoop(
         300,
         1000
     );
+}
+
+function GenerateNewPrice(
+    currPrice: number,
+    rng: RandomGenerator,
+    tick: number,
+    influence?: number
+): number {
+    return currPrice + rng.generateDirection(influence) * tick;
 }
 
 function AddNewPriceData(
@@ -242,80 +375,96 @@ const DefaultMarketPortfolio = function (): Portfolio {
         name: 'NVidia',
         currPrice: 10,
         tick: 0.1,
-        quantity: 10_000
+        quantity: 10_000,
+        directionInfluence: 0.5
     } as Stock;
 
-    stocks['AAPL'] = {
-        ticker: 'AAPL',
-        name: 'Apple',
-        currPrice: 20,
-        tick: 0.1,
-        quantity: 10_000
-    } as Stock;
+    // stocks['AAPL'] = {
+    //     ticker: 'AAPL',
+    //     name: 'Apple',
+    //     currPrice: 20,
+    //     tick: 0.1,
+    //     quantity: 10_000
+    // } as Stock;
 
-    stocks['TSMC'] = {
-        ticker: 'TSMC',
-        name: 'Taiwan Semiconductor Company',
-        currPrice: 30,
-        tick: 0.1,
-        quantity: 10_000
-    } as Stock;
+    // stocks['TSMC'] = {
+    //     ticker: 'TSMC',
+    //     name: 'Taiwan Semiconductor Company',
+    //     currPrice: 30,
+    //     tick: 0.1,
+    //     quantity: 10_000
+    // } as Stock;
 
-    stocks['AMD'] = {
-        ticker: 'AMD',
-        name: 'Advanced Micro Devices',
-        currPrice: 40,
-        tick: 0.1,
-        quantity: 10_000
-    } as Stock;
+    // stocks['AMD'] = {
+    //     ticker: 'AMD',
+    //     name: 'Advanced Micro Devices',
+    //     currPrice: 40,
+    //     tick: 0.1,
+    //     quantity: 10_000
+    // } as Stock;
 
-    stocks['MSFT'] = {
-        ticker: 'MSFT',
-        name: 'Microsoft',
-        currPrice: 50,
-        tick: 0.5,
-        quantity: 10_000
-    } as Stock;
+    // stocks['MSFT'] = {
+    //     ticker: 'MSFT',
+    //     name: 'Microsoft',
+    //     currPrice: 50,
+    //     tick: 0.5,
+    //     quantity: 10_000
+    // } as Stock;
 
-    stocks['U'] = {
-        ticker: 'U',
-        name: 'Unity',
-        currPrice: 60,
-        tick: 0.5,
-        quantity: 10_000
-    } as Stock;
+    // stocks['U'] = {
+    //     ticker: 'U',
+    //     name: 'Unity',
+    //     currPrice: 60,
+    //     tick: 0.5,
+    //     quantity: 10_000
+    // } as Stock;
 
-    stocks['WBUY'] = {
-        ticker: 'WBUY',
-        name: 'Worst Buy',
-        currPrice: 70,
-        tick: 0.5,
-        quantity: 10_000
-    } as Stock;
+    // stocks['WBUY'] = {
+    //     ticker: 'WBUY',
+    //     name: 'Worst Buy',
+    //     currPrice: 70,
+    //     tick: 0.5,
+    //     quantity: 10_000
+    // } as Stock;
 
-    stocks['DUO'] = {
-        ticker: 'DUO',
-        name: 'DuoLimbo',
-        currPrice: 80,
-        tick: 0.5,
-        quantity: 10_000
-    } as Stock;
+    // stocks['DUO'] = {
+    //     ticker: 'DUO',
+    //     name: 'DuoLimbo',
+    //     currPrice: 80,
+    //     tick: 0.5,
+    //     quantity: 10_000
+    // } as Stock;
 
-    stocks['ETC'] = {
-        ticker: 'ETC',
-        name: 'Et Tu Chungus',
-        currPrice: 90,
-        tick: 0.5,
-        quantity: 10_000
-    } as Stock;
+    // stocks['ETC'] = {
+    //     ticker: 'ETC',
+    //     name: 'Et Tu Chungus',
+    //     currPrice: 90,
+    //     tick: 0.5,
+    //     quantity: 10_000
+    // } as Stock;
 
-    stocks['BEEG'] = {
-        ticker: 'BEEG',
-        name: 'Beeg Beeg Games',
-        currPrice: 100,
-        tick: 1,
-        quantity: 10_000
-    } as Stock;
+    // stocks['BEEG'] = {
+    //     ticker: 'BEEG',
+    //     name: 'Beeg Beeg Games',
+    //     currPrice: 100,
+    //     tick: 1,
+    //     quantity: 10_000
+    // } as Stock;
 
     return stocks;
 };
+
+function ReturnStockCopy(stock: Stock): Stock {
+    return {
+        ticker: stock.ticker,
+        name: stock.name,
+        currPrice: stock.currPrice,
+        quantity: stock.quantity,
+        delta: stock.delta,
+        deltaPercentage: stock.deltaPercentage,
+        lastDelta: stock.lastDelta,
+        tick: stock.tick,
+        lastUpdate: stock.lastUpdate,
+        directionInfluence: stock.directionInfluence
+    };
+}
