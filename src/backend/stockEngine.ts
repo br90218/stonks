@@ -58,6 +58,12 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('get-cash', (callback): void => {
+        callback({
+            response: runFile.cash
+        });
+    });
+
     socket.on('start-stocksim', (): void => {
         startStockEngine();
     });

@@ -67,7 +67,6 @@ app.whenReady().then(async () => {
     const socket = io('http://localhost:3333');
 
     const mainWindow = createWindow();
-    mainWindow.webContents.openDevTools();
 
     app.on('activate', function () {
         // On macOS it's common to re-create a window in the app when the

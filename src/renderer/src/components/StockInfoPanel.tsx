@@ -1,9 +1,11 @@
 import { Portfolio, StockInfo } from '@renderer/data/Interface';
 import { StockInfoButton } from './Buttons/StockInfoButton';
 import { useEffect, useState } from 'react';
-import styles from '@renderer/assets/css/gameview.module.css';
 
-function StockButtonList(props: { stockList: { id: string; stock: StockInfo }[] | undefined }) {
+function StockButtonList(props: {
+    stockList: { id: string; stock: StockInfo }[] | undefined;
+    gvCallback: (childData: { msgType: string; arg?: string[] }) => void;
+}): JSX.Element {
     const [buttonsList, setButtonsList] = useState<{ id: string; stock: StockInfo }[]>([]);
 
     useEffect(() => {
@@ -24,8 +26,12 @@ function StockButtonList(props: { stockList: { id: string; stock: StockInfo }[] 
                             stock={{
                                 ticker: item.stock.ticker,
                                 name: item.stock.name,
-                                currPrice: item.stock.currPrice
+                                currPrice: item.stock.currPrice,
+                                delta: item.stock.delta,
+                                deltaPercentage: item.stock.deltaPercentage,
+                                lastDelta: item.stock.lastDelta
                             }}
+                            gvCallback={props.gvCallback}
                         />
                     </li>
                 );
@@ -34,7 +40,10 @@ function StockButtonList(props: { stockList: { id: string; stock: StockInfo }[] 
     );
 }
 
-export function StockInfoPanel(props: { market?: Portfolio | undefined }) {
+export function StockInfoPanel(props: {
+    market?: Portfolio | undefined;
+    gvCallback: (childData: { msgType: string; arg?: string[] }) => void;
+}): JSX.Element {
     const [stockList, setStockList] = useState<{ id: string; stock: StockInfo }[]>();
     useEffect(() => {
         const list: { id: string; stock: StockInfo }[] = [];
@@ -46,5 +55,5 @@ export function StockInfoPanel(props: { market?: Portfolio | undefined }) {
         });
         setStockList(list);
     }, [props.market]);
-    return <StockButtonList stockList={stockList} />;
+    return <StockButtonList stockList={stockList} gvCallback={props.gvCallback} />;
 }

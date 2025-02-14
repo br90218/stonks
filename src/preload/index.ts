@@ -20,8 +20,16 @@ const api = {
             callback(value);
         });
     },
+    onStockInfo: (callback): void => {
+        ipcRenderer.on('stockinfo', (_event, value) => {
+            callback(value);
+        });
+    },
     getConnectionStatus: () => {
         return ipcRenderer.invoke('backendStatus');
+    },
+    getCurrentCash: async () => {
+        return await ipcRenderer.invoke('request', 'get-cash');
     },
     startStockSim: () => {
         console.log('frontend requested start stock sim');
@@ -29,11 +37,6 @@ const api = {
     },
     getMarketPortfolio: async () => {
         return await ipcRenderer.invoke('request', 'get-marketPortfolio');
-    },
-    onStockInfoChanged: (callback): void => {
-        ipcRenderer.on('stockinfo', (_event, value) => {
-            callback(value);
-        });
     }
 };
 

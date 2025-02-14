@@ -7,6 +7,9 @@ export interface StockInfo {
     ticker: string;
     name: string;
     currPrice: number;
+    delta: number;
+    deltaPercentage: number;
+    lastDelta: number;
 }
 
 export interface Portfolio {
@@ -24,4 +27,14 @@ interface StockChartDataSeries {
 interface StockChartData {
     x: Date;
     y: number[];
+}
+
+export function LoadingStockInfo(): StockInfo {
+    const stockInfo = EmptyStockInfo();
+    stockInfo.name = 'Loading';
+    return stockInfo;
+}
+
+export function EmptyStockInfo(): StockInfo {
+    return { ticker: 'N/A', name: 'No Stock Selected', currPrice: 0, delta: 0, deltaPercentage: 0 };
 }

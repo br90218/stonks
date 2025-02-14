@@ -1,0 +1,43 @@
+.buyPanel{
+    background-color: darkmagenta;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 2fr;
+    padding: 20px;
+}
+
+.upperPane{
+    display:grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr;
+}
+
+.priceInfo{
+    text-align: right;
+}
+
+.lowerPane{
+    display:grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows:1fr;
+    text-align: center;
+}
+
+.buyColumn{
+    display:grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 2fr 2fr 2fr;
+}
+
+.sellColumn{
+    display:grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 2fr 2fr 2fr;
+}
+
+.portfolioColumn{
+}
+
+

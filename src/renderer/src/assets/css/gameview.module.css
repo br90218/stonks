@@ -41,12 +41,8 @@
 .mainRight{
     display:grid;
     grid-template-columns:1fr;
-    grid-template-rows:4fr 1fr;
+    grid-template-rows:1fr 1fr;
     gap:10px;
-}
-
-.buypanel{
-    background-color: darkmagenta;
 }
 
 .inventory{
@@ -59,4 +55,8 @@
     text-align: center;
     background-color: maroon;
 
+}
+
+.footer .inventory .buypanel .info .chart .header {
+    border-radius: 50px;
 }

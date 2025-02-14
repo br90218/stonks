@@ -17,7 +17,6 @@ export function StockChartPanel(props: {
     const chartContainerRef = createRef<HTMLDivElement>();
     const chartRef = useRef<IChartApi>();
     const seriesRef = useRef();
-    const listeningTicker = useRef('NVDA');
 
     useEffect(() => {}, [props.market, props.tickerToShow]);
     useEffect(() => {
@@ -35,22 +34,22 @@ export function StockChartPanel(props: {
         return (): void => {
             chartRef.current?.remove();
         };
-    }, [listeningTicker]);
+    }, [props.tickerToShow]);
 
     useEffect(() => {
         //TODO: should there be a safe removal?
         window.api.onStockChartNewData((value) => {
-            if (value.ticker != listeningTicker.current) {
+            if (value.ticker != props.tickerToShow) {
                 return;
             }
             const filtered: CandlestickData = {
                 time: value.data.time,
-                open: value.data.open,
-                high: value.data.high,
-                low: value.data.low,
-                close: value.data.close
+                open: value.data.price.open,
+                high: value.data.price.high,
+                low: value.data.price.low,
+                close: value.data.price.close
             };
-            //seriesRef.current.update(filtered);
+            seriesRef.current.update(filtered);
         });
     }, []);
 
@@ -62,7 +61,7 @@ const chartOptions: ChartOptions = {
         background: { type: ColorType.Solid, color: 'black' },
         textColor: 'white',
         fontFamily: '',
-        attributionLogo: false,
+        attributionLogo: true,
         colorSpace: 'display-p3',
         colorParsers: []
     },

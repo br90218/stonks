@@ -124,25 +124,38 @@ function StockSimulationLoop(
     return rng.randomInterval(
         () => {
             const stock = market[ticker];
+            const currPrice = stock.currPrice;
             const newPrice = stock.currPrice + rng.generateDirection() * stock.tick;
-            const newStockInfo: Stock = {
-                ticker: stock.ticker,
-                name: stock.name,
-                currPrice: newPrice,
-                tick: stock.tick, // TODO: shuld change when price is at a certain threshold
-                quantity: stock.quantity,
-                lastUpdate: dateService.ParseDate()
-            };
-            market[stock.ticker] = newStockInfo;
+            const date = dateService.ParseDate();
 
             history[stock.ticker].priceHistory = AddNewPriceData(
                 history[stock.ticker].priceHistory,
-                newStockInfo.lastUpdate,
+                date,
                 newPrice
             );
             const latest =
                 history[stock.ticker].priceHistory[history[stock.ticker].priceHistory.length - 1];
             io.emit('message', 'stockprice', { ticker: stock.ticker, data: latest });
+
+            const openPrice = history[stock.ticker].priceHistory[0].price.close;
+            const delta = latest.price.close - openPrice;
+            const percentage = delta / openPrice;
+            const lastDelta = newPrice - currPrice;
+
+            const newStockInfo: Stock = {
+                ticker: stock.ticker,
+                name: stock.name,
+                currPrice: newPrice,
+                delta: delta,
+                deltaPercentage: percentage,
+                lastDelta: lastDelta,
+                tick: stock.tick, // TODO: shuld change when price is at a certain threshold
+                quantity: stock.quantity,
+                lastUpdate: date
+            };
+
+            market[stock.ticker] = newStockInfo;
+            io.emit('message', 'stockinfo', { ticker: stock.ticker, data: newStockInfo });
         },
         300,
         1000
@@ -263,7 +276,7 @@ const DefaultMarketPortfolio = function (): Portfolio {
 
     stocks['DUO'] = {
         ticker: 'DUO',
-        name: 'DuoLingo',
+        name: 'DuoLimbo',
         currPrice: 80,
         tick: 0.5,
         quantity: 10_000
