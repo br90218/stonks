@@ -10,7 +10,7 @@ import express, { Express } from 'express';
 import { RandomGenerator } from './RandomGenerator';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
-import { InstantiateMarket, startAllStockSimulation } from './services/MarketService';
+import { BuyStock, InstantiateMarket, startAllStockSimulation } from './services/MarketService';
 import { DateService } from './services/DateService';
 
 const app = express();
@@ -37,28 +37,28 @@ function startStockEngine(): void {
 }
 
 io.on('connection', (socket) => {
-    socket.on('get-runfile', (callback): void => {
+    socket.on('get-runfile', (args, callback): void => {
         runFile = RetrieveRunFile(true);
         callback({
             response: runFile
         });
     });
 
-    socket.on('buy-stock', (stockName, price, quantity, callback): void => {
-        console.log(`buying ${stockName} @ ${price} x ${quantity}`);
-
+    socket.on('buy-stock', (args, callback): void => {
+        console.log('bbb');
+        const result = BuyStock(runFile, market, dateService, args[0], args[1], args[2]);
         callback({
-            response: true
+            response: result
         });
     });
 
-    socket.on('get-marketPortfolio', (callback): void => {
+    socket.on('get-marketPortfolio', (args, callback): void => {
         callback({
             response: market
         });
     });
 
-    socket.on('get-cash', (callback): void => {
+    socket.on('get-cash', (args, callback): void => {
         callback({
             response: runFile.cash
         });

@@ -1,26 +1,27 @@
-import { EmptyStockInfo, StockInfo } from '@renderer/data/Interface';
+import { CallBackMessage, EmptyStockInfo, StockInfo } from '@renderer/data/Interface';
 import { useEffect, useState } from 'react';
 
 export function StockInfoButton(props: {
     stock: StockInfo | undefined;
-    gvCallback: (childData: { msgType: string; arg?: string[] }) => void;
+    gvCallback: (childData: CallBackMessage) => void;
 }): JSX.Element {
     const [stock, setStock] = useState<StockInfo>(EmptyStockInfo());
-    const [direction, setDirection] = useState('equal');
+    const [direction, setDirection] = useState('price-equal');
+    //TODO: the loop here is wrong. Direction is usually one render slower than actual price move.
     useEffect(() => {
-        if (props.stock) setStock(props.stock);
+        if (props.stock) {
+            setStock(props.stock);
+            if (props.stock.lastDelta > 0) {
+                setDirection('price-up');
+            } else if (props.stock.lastDelta == 0) {
+                setDirection('price-equal');
+            } else {
+                setDirection('price-down');
+            }
+        }
     }, [props.stock]);
 
-    useEffect(() => {
-        console.log(stock.lastDelta);
-        if (stock.lastDelta > 0) {
-            setDirection('price-up');
-        } else if (stock.lastDelta == 0) {
-            setDirection('price-equal');
-        } else {
-            setDirection('price-down');
-        }
-    }, [stock]);
+    useEffect(() => {}, [stock]);
 
     function selectTicker(): void {
         if (stock) {

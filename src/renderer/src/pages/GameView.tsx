@@ -3,7 +3,14 @@ import { NewsFlashPanel } from '@renderer/components/NewsFlashPanel';
 import { StatusPanel } from '@renderer/components/StatusPanel';
 import { StockChartPanel } from '@renderer/components/StockChartPanel';
 import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
-import { LoadingStockInfo, Portfolio, StockInfo } from '@renderer/data/Interface';
+import {
+    CallBackMessage,
+    EmptyUserPortfolio,
+    LoadingStockInfo,
+    Portfolio,
+    StockInfo,
+    UserPortfolio
+} from '@renderer/data/Interface';
 import { useEffect, useState } from 'react';
 import styles from '@renderer/assets/css/gameview.module.css';
 import { InventoryPanel } from '@renderer/components/InventoryPanel';
@@ -12,6 +19,8 @@ export function GameView(): JSX.Element {
     const [market, setMarket] = useState<Portfolio>();
     const [selectedTicker, setSelectedTicker] = useState<string>('NVDA');
     const [latestStockInfo, setLatestStockInfo] = useState<StockInfo>(LoadingStockInfo());
+    const [latestUserPortfolio, setLatestUserPortfolio] =
+        useState<UserPortfolio>(EmptyUserPortfolio());
     useEffect(() => {
         window.api.startStockSim();
         window.api.onStockInfo((value) => {
@@ -20,7 +29,8 @@ export function GameView(): JSX.Element {
                 name: value.data.name,
                 currPrice: value.data.currPrice,
                 delta: value.data.delta,
-                deltaPercentage: value.data.deltaPercentage
+                deltaPercentage: value.data.deltaPercentage,
+                lastDelta: value.data.lastDelta
             };
             setLatestStockInfo(stockInfo);
         });
@@ -36,7 +46,7 @@ export function GameView(): JSX.Element {
         setMarket(fetched);
     };
 
-    const handleChildCallback = (childData: { msgType: string; arg?: string[] }): void => {
+    const handleChildCallback = async (childData: CallBackMessage): Promise<void> => {
         switch (childData.msgType) {
             case 'selectNewTicker':
                 if (childData.arg && childData.arg.length == 1) {
@@ -44,6 +54,23 @@ export function GameView(): JSX.Element {
                 }
                 break;
             case 'buyStock':
+                if (childData.arg && childData.arg.length == 3) {
+                    const result = await window.api.buyStock(
+                        childData.arg[0],
+                        childData.arg[1],
+                        childData.arg[2]
+                    );
+                    if (result.result) {
+                        setLatestUserPortfolio({
+                            cash: result.file.cash,
+                            portfolio: result.file.portfolio
+                        });
+                    } else {
+                        //TODO: handle something here
+                    }
+                }
+                break;
+            case 'sellStock':
                 break;
             default:
                 break;
@@ -66,7 +93,11 @@ export function GameView(): JSX.Element {
                 </div>
                 <div className={styles.mainRight}>
                     <div className={styles.buypanel}>
-                        <BuyPanel tickerToShow={selectedTicker} stockInfo={latestStockInfo} />
+                        <BuyPanel
+                            tickerToShow={selectedTicker}
+                            stockInfo={latestStockInfo}
+                            gvCallback={handleChildCallback}
+                        />
                     </div>
                     <div className={styles.inventory}>
                         <InventoryPanel />

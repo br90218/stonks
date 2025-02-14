@@ -5,9 +5,9 @@ export interface Stock {
     name: string;
     currPrice: number;
     quantity: number; //NOTE: i would actually like to separate SHARE from STOCK. quantity should not be here.
-    delta: number;
-    deltaPercentage: number;
-    lastDelta: number;
+    delta?: number;
+    deltaPercentage?: number;
+    lastDelta?: number;
     tick: number;
     lastUpdate: string;
 }
@@ -42,4 +42,13 @@ interface OHLC {
     high: number;
     low: number;
     close: number;
+}
+
+export interface StockOperationResponse {
+    result: boolean;
+    detail: string;
+    file?: {
+        cash: number;
+        portfolio: Portfolio;
+    };
 }

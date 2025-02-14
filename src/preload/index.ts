@@ -35,6 +35,13 @@ const api = {
         console.log('frontend requested start stock sim');
         return ipcRenderer.invoke('command', 'start-stocksim');
     },
+    buyStock: async (ticker: string, price: string, quantity: string) => {
+        return await ipcRenderer.invoke('request', 'buy-stock', [
+            ticker,
+            Number(price),
+            Number(quantity)
+        ]);
+    },
     getMarketPortfolio: async () => {
         return await ipcRenderer.invoke('request', 'get-marketPortfolio');
     }

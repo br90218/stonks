@@ -1,34 +1,45 @@
 import { Server } from 'socket.io';
 import { RandomGenerator } from '../RandomGenerator';
-import { MarketHistory, Portfolio, PriceDataAtTime, Stock } from './Objects';
+import {
+    MarketHistory,
+    Portfolio,
+    PriceDataAtTime,
+    Stock,
+    StockOperationResponse
+} from './Objects';
 import { RunFile } from './Objects';
 import { DateService } from './DateService';
 
 export function BuyStock(
     runFile: RunFile,
     market: Portfolio,
+    dateService: DateService,
     ticker: string,
     price: number,
     quantity: number
-): RunFile {
+): StockOperationResponse {
     if (!runFile || !runFile.portfolio) {
         console.error(
             `did not supply runFile or runFile portfolio does not exist when buying stock`
         );
-        return runFile;
+        return { result: false, detail: 'runFile-error' };
     }
-    if (!market) {
-        console.error(`did not supply market when buying stock`);
-        return runFile;
+    if (!market || !dateService) {
+        console.error(`did not supply market or dateService when buying stock`);
+        return { result: false, detail: 'internal-error' };
+    }
+
+    if (runFile.cash < price * quantity) {
+        return { result: false, detail: 'insufficient-cash' };
     }
 
     //NOTE: this buying mechanism assumes no slippage;
     // it also means that orders will be fulfilled regardless
     // of the quoted price.
 
-    const portfolioStock = runFile.portfolio?.[ticker];
+    const portfolioStock = runFile.portfolio[ticker];
     const marketStock = market[ticker];
-    const updateTime = new Date();
+    const updateTime = dateService.ParseDate();
 
     const updatedStock: Stock = {
         ticker: ticker,
@@ -45,17 +56,25 @@ export function BuyStock(
     };
 
     const updatedMarketStock: Stock = {
-        ticker: ticker,
+        ticker: marketStock.ticker,
         name: marketStock.name,
         currPrice: marketStock.currPrice,
         quantity: marketStock.quantity - quantity,
         tick: marketStock.tick,
+        delta: marketStock.delta,
+        deltaPercentage: marketStock.deltaPercentage,
+        lastDelta: marketStock.lastDelta,
         lastUpdate: updateTime
     };
-
     runFile.portfolio[ticker] = updatedStock;
     marketStock[ticker] = updatedMarketStock;
-    return runFile;
+    runFile.cash -= quantity * price;
+
+    return {
+        result: true,
+        detail: 'ok',
+        file: { cash: runFile.cash, portfolio: runFile.portfolio }
+    };
 }
 
 function calculateAveragePrice(
@@ -135,7 +154,7 @@ function StockSimulationLoop(
             );
             const latest =
                 history[stock.ticker].priceHistory[history[stock.ticker].priceHistory.length - 1];
-            io.emit('message', 'stockprice', { ticker: stock.ticker, data: latest });
+            //io.emit('message', 'stockprice', { ticker: stock.ticker, data: latest });
 
             const openPrice = history[stock.ticker].priceHistory[0].price.close;
             const delta = latest.price.close - openPrice;

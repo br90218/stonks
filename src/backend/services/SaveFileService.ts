@@ -21,7 +21,8 @@ export function RetrieveRunFile(offline = false): RunFile | null {
             const runFile: RunFile = {
                 name: jsonObject.name,
                 seed: jsonObject.seed,
-                cash: 100_000
+                cash: 100_000,
+                portfolio: {}
             };
             return runFile;
         }

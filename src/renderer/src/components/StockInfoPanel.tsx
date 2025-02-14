@@ -1,10 +1,10 @@
-import { Portfolio, StockInfo } from '@renderer/data/Interface';
+import { CallBackMessage, Portfolio, StockInfo } from '@renderer/data/Interface';
 import { StockInfoButton } from './Buttons/StockInfoButton';
 import { useEffect, useState } from 'react';
 
 function StockButtonList(props: {
     stockList: { id: string; stock: StockInfo }[] | undefined;
-    gvCallback: (childData: { msgType: string; arg?: string[] }) => void;
+    gvCallback: (childData: CallBackMessage) => void;
 }): JSX.Element {
     const [buttonsList, setButtonsList] = useState<{ id: string; stock: StockInfo }[]>([]);
 

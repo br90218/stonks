@@ -92,17 +92,17 @@ app.whenReady().then(async () => {
         return socket.connected;
     });
 
-    ipcMain.handle('command', (event, command) => {
-        socket.emit(command);
+    ipcMain.handle('command', (event, command, args) => {
+        console.log(args);
+        socket.emit(command, args);
     });
 
-    ipcMain.handle('request', async (event, message) => {
+    ipcMain.handle('request', async (event, message, args) => {
         if (!socket.connected) {
             console.error('socket is not connected yet');
             return;
         }
-        const reply = await socket.emitWithAck(message);
-        //console.log(reply);
+        const reply = await socket.emitWithAck(message, args);
         return reply.response;
     });
 
