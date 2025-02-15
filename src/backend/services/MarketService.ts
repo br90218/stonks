@@ -220,17 +220,9 @@ export function startAllStockSimulation(
     dateService: DateService
 ): object {
     const stockSimulationLoops = {};
-    const marketHistory = NewMarketHistory(market);
 
     Object.keys(market).forEach((ticker) => {
-        stockSimulationLoops[ticker] = StockSimulationLoop(
-            rng,
-            io,
-            ticker,
-            market,
-            marketHistory,
-            dateService
-        );
+        stockSimulationLoops[ticker] = StockSimulationLoop(rng, io, ticker, market, dateService);
     });
 
     dateService.StartDateProgression();
@@ -249,10 +241,22 @@ export function stopStockSimulation(stockSimulationLoops: object, ticker: string
     return stockSimulationLoops;
 }
 
+export function GetMarketStockHistory(market: Portfolio, ticker: string) {
+    return market[ticker].history;
+}
+
+//TODO: does not catch exception when market[ticker] returns jackshit
 export function AddInfluenceToStock(market: Portfolio, ticker: string, influence: number): void {
     const newStock = ReturnStockCopy(market[ticker]);
     newStock.directionInfluence = Math.max(0, Math.min(newStock.directionInfluence + influence, 1));
     console.log(newStock.directionInfluence);
+    market[ticker] = newStock;
+}
+
+//TODO: does not catch exception when market[ticker] returns jackshit
+export function SetTickToStock(market: Portfolio, ticker: string, newTick: number): void {
+    const newStock = ReturnStockCopy(market[ticker]);
+    newStock.tick = newTick;
     market[ticker] = newStock;
 }
 
@@ -261,7 +265,6 @@ function StockSimulationLoop(
     io: Server,
     ticker: string,
     market: Portfolio,
-    history: MarketHistory,
     dateService: DateService
 ) {
     return rng.randomInterval(
@@ -276,16 +279,14 @@ function StockSimulationLoop(
             );
             const date = dateService.ParseDate();
 
-            history[stock.ticker].priceHistory = AddNewPriceData(
-                history[stock.ticker].priceHistory,
+            const newStockHistory: PriceDataAtTime[] = AddNewPriceData(
+                stock.history,
                 date,
                 newPrice
             );
-            const latest =
-                history[stock.ticker].priceHistory[history[stock.ticker].priceHistory.length - 1];
-            //io.emit('message', 'stockprice', { ticker: stock.ticker, data: latest });
+            const latest = newStockHistory[newStockHistory.length - 1];
 
-            const openPrice = history[stock.ticker].priceHistory[0].price.close;
+            const openPrice = newStockHistory[0].price.close;
             const delta = latest.price.close - openPrice;
             const percentage = delta / openPrice;
             const lastDelta = newPrice - currPrice;
@@ -296,9 +297,11 @@ function StockSimulationLoop(
             newStockInfo.deltaPercentage = percentage;
             newStockInfo.lastDelta = lastDelta;
             newStockInfo.lastUpdate = date;
+            newStockInfo.history = newStockHistory;
 
             market[stock.ticker] = newStockInfo;
             io.emit('message', 'stockinfo', { ticker: stock.ticker, data: newStockInfo });
+            io.emit('message', 'stockprice', { ticker: stock.ticker, price: latest });
         },
         300,
         1000
@@ -331,32 +334,34 @@ function AddNewPriceData(
                 close: price
             }
         };
-    } else {
-        const latestEntry = history[history.length - 1];
-        if (time != latestEntry.time) {
-            //means we're one day ahead now
-            newPriceDataAtTime = {
-                time: time,
-                price: {
-                    open: price,
-                    high: price,
-                    low: price,
-                    close: price
-                }
-            };
-        } else {
-            newPriceDataAtTime = {
-                time: time,
-                price: {
-                    open: latestEntry.price.open,
-                    high: price > latestEntry.price.high ? price : latestEntry.price.high,
-                    low: price < latestEntry.price.low ? price : latestEntry.price.low,
-                    close: price
-                }
-            };
-        }
+        history.push(newPriceDataAtTime);
+        return history;
     }
-    history.push(newPriceDataAtTime);
+    const latestEntry = history[history.length - 1];
+    if (time != latestEntry.time) {
+        //means we're one day ahead now
+        newPriceDataAtTime = {
+            time: time,
+            price: {
+                open: price,
+                high: price,
+                low: price,
+                close: price
+            }
+        };
+        history.push(newPriceDataAtTime);
+        return history;
+    }
+    newPriceDataAtTime = {
+        time: time,
+        price: {
+            open: latestEntry.price.open,
+            high: price > latestEntry.price.high ? price : latestEntry.price.high,
+            low: price < latestEntry.price.low ? price : latestEntry.price.low,
+            close: price
+        }
+    };
+    history[history.length - 1] = newPriceDataAtTime;
     return history;
 }
 
@@ -376,80 +381,99 @@ const DefaultMarketPortfolio = function (): Portfolio {
         currPrice: 10,
         tick: 0.1,
         quantity: 10_000,
-        directionInfluence: 0.5
-    } as Stock;
+        directionInfluence: 0.5,
+        history: []
+    };
 
-    // stocks['AAPL'] = {
-    //     ticker: 'AAPL',
-    //     name: 'Apple',
-    //     currPrice: 20,
-    //     tick: 0.1,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['AAPL'] = {
+        ticker: 'AAPL',
+        name: 'Apple',
+        currPrice: 100,
+        tick: 1,
+        quantity: 10_000,
+        directionInfluence: 0.5,
+        history: []
+    };
 
-    // stocks['TSMC'] = {
-    //     ticker: 'TSMC',
-    //     name: 'Taiwan Semiconductor Company',
-    //     currPrice: 30,
-    //     tick: 0.1,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['TSMC'] = {
+        ticker: 'TSMC',
+        name: 'Taiwan Semiconductor Company',
+        currPrice: 30,
+        tick: 0.1,
+        quantity: 10_000,
+        directionInfluence: 0.5,
+        history: []
+    };
 
-    // stocks['AMD'] = {
-    //     ticker: 'AMD',
-    //     name: 'Advanced Micro Devices',
-    //     currPrice: 40,
-    //     tick: 0.1,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['AMD'] = {
+        ticker: 'AMD',
+        name: 'Advanced Micro Devices',
+        currPrice: 40,
+        tick: 0.1,
+        quantity: 10_000,
+        directionInfluence: 0.5,
+        history: []
+    };
 
-    // stocks['MSFT'] = {
-    //     ticker: 'MSFT',
-    //     name: 'Microsoft',
-    //     currPrice: 50,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['MSFT'] = {
+        ticker: 'MSFT',
+        name: 'Microsoft',
+        currPrice: 50,
+        tick: 0.5,
+        quantity: 10_000,
+        directionInfluence: 0.5,
+        history: []
+    };
 
-    // stocks['U'] = {
-    //     ticker: 'U',
-    //     name: 'Unity',
-    //     currPrice: 60,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['U'] = {
+        ticker: 'U',
+        name: 'Unity',
+        currPrice: 60,
+        tick: 0.5,
+        quantity: 10_000,
+        directionInfluence: 0.5,
+        history: []
+    };
 
-    // stocks['WBUY'] = {
-    //     ticker: 'WBUY',
-    //     name: 'Worst Buy',
-    //     currPrice: 70,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['WBUY'] = {
+        ticker: 'WBUY',
+        name: 'Worst Buy',
+        currPrice: 70,
+        tick: 0.5,
+        quantity: 10_000,
+        directionInfluence: 0.5,
+        history: []
+    };
 
-    // stocks['DUO'] = {
-    //     ticker: 'DUO',
-    //     name: 'DuoLimbo',
-    //     currPrice: 80,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['DUO'] = {
+        ticker: 'DUO',
+        name: 'DuoLimbo',
+        currPrice: 80,
+        tick: 0.5,
+        quantity: 10_000,
+        directionInfluence: 0.5,
+        history: []
+    };
 
-    // stocks['ETC'] = {
-    //     ticker: 'ETC',
-    //     name: 'Et Tu Chungus',
-    //     currPrice: 90,
-    //     tick: 0.5,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['ETC'] = {
+        ticker: 'ETC',
+        name: 'Et Tu Chungus',
+        currPrice: 90,
+        tick: 0.5,
+        quantity: 10_000,
+        directionInfluence: 0.5,
+        history: []
+    };
 
-    // stocks['BEEG'] = {
-    //     ticker: 'BEEG',
-    //     name: 'Beeg Beeg Games',
-    //     currPrice: 100,
-    //     tick: 1,
-    //     quantity: 10_000
-    // } as Stock;
+    stocks['BEEG'] = {
+        ticker: 'BEEG',
+        name: 'Beeg Beeg Games',
+        currPrice: 100,
+        tick: 1,
+        quantity: 10_000,
+        directionInfluence: 0.5,
+        history: []
+    };
 
     return stocks;
 };
@@ -465,6 +489,7 @@ function ReturnStockCopy(stock: Stock): Stock {
         lastDelta: stock.lastDelta,
         tick: stock.tick,
         lastUpdate: stock.lastUpdate,
-        directionInfluence: stock.directionInfluence
+        directionInfluence: stock.directionInfluence,
+        history: stock.history
     };
 }

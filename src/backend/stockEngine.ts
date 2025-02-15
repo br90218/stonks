@@ -13,9 +13,11 @@ import {
     AddInfluenceToStock,
     BuyStock,
     GetMarketStock,
+    GetMarketStockHistory,
     GetPlayerStock,
     InstantiateMarket,
     SellStock,
+    SetTickToStock,
     startAllStockSimulation
 } from './services/MarketService';
 import { DateService } from './services/DateService';
@@ -79,9 +81,19 @@ io.on('connection', (socket) => {
         AddInfluenceToStock(market, args[0], args[1]);
     });
 
+    socket.on('set-stock-tick', (args): void => {
+        SetTickToStock(market, args[0], args[1]);
+    });
+
     socket.on('get-marketStock', (args, callback): void => {
         callback({
             response: GetMarketStock(market, args)
+        });
+    });
+
+    socket.on('get-marketStock-history', (args, callback): void => {
+        callback({
+            response: GetMarketStockHistory(market, args[0])
         });
     });
 

@@ -11,6 +11,7 @@ export interface Stock {
     tick: number;
     lastUpdate: string;
     directionInfluence: number;
+    history: PriceDataAtTime[];
 }
 
 export interface RunFile {
@@ -29,7 +30,6 @@ export interface MarketHistory {
 }
 
 export interface StockHistory {
-    ticker: string;
     priceHistory: PriceDataAtTime[];
 }
 
