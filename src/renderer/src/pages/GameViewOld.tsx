@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import styles from '@renderer/assets/css/gameview.module.css';
 import { InventoryPanel } from '@renderer/components/InventoryPanel';
 
-export function GameView(): JSX.Element {
+export function GameViewOld(): JSX.Element {
     const [market, setMarket] = useState<Portfolio>();
     const [selectedTicker, setSelectedTicker] = useState<string>('NVDA');
     const [latestStockInfo, setLatestStockInfo] = useState<StockInfo>(LoadingStockInfo());
