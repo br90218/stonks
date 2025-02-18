@@ -1,4 +1,4 @@
-import { CallBackMessage, Portfolio, StockInfo } from '@renderer/data/Interface';
+import { CallBackMessage, EmptyStockInfo, Portfolio, StockInfo } from '@renderer/data/Interface';
 import { StockInfoButton } from './Buttons/StockInfoButton';
 import { useEffect, useState } from 'react';
 import styles from '@renderer/assets/css/stockinfopanel.module.css';
@@ -7,7 +7,9 @@ function StockButtonList(props: {
     stockList: { id: string; stock: StockInfo }[] | undefined;
     gvCallback: (childData: CallBackMessage) => void;
 }): JSX.Element {
-    const [buttonsList, setButtonsList] = useState<{ id: string; stock: StockInfo }[]>([]);
+    const [buttonsList, setButtonsList] = useState<{ id: string; stock: StockInfo }[]>([
+        { id: 'NVDA', stock: EmptyStockInfo() }
+    ]);
 
     useEffect(() => {
         let list: { id: string; stock: StockInfo }[] = [];
@@ -15,11 +17,10 @@ function StockButtonList(props: {
             list = list.concat({ id: stock.id, stock: stock.stock });
         });
         setButtonsList(list);
-        // console.log(buttonsList);
     }, [props.stockList]);
 
     return (
-        <ul className={styles.stockList} style={{ height: '100%', padding: '10px' }}>
+        <ul className={styles.stockList}>
             {buttonsList.map((item) => {
                 return (
                     <li style={{ float: 'left', height: '100%' }} key={item.id}>
@@ -45,7 +46,16 @@ export function StockInfoPanel(props: {
     market?: Portfolio | undefined;
     gvCallback: (childData: { msgType: string; arg?: string[] }) => void;
 }): JSX.Element {
-    const [stockList, setStockList] = useState<{ id: string; stock: StockInfo }[]>();
+    const [stockList, setStockList] = useState<{ id: string; stock: StockInfo }[]>([
+        { id: 'NVDA', stock: EmptyStockInfo() },
+        { id: 'NVDA', stock: EmptyStockInfo() },
+        { id: 'NVDA', stock: EmptyStockInfo() },
+        { id: 'NVDA', stock: EmptyStockInfo() },
+        { id: 'NVDA', stock: EmptyStockInfo() },
+        { id: 'NVDA', stock: EmptyStockInfo() },
+        { id: 'NVDA', stock: EmptyStockInfo() },
+        { id: 'NVDA', stock: EmptyStockInfo() }
+    ]);
     useEffect(() => {
         const list: { id: string; stock: StockInfo }[] = [];
         if (!props.market) {
@@ -57,7 +67,7 @@ export function StockInfoPanel(props: {
         setStockList(list);
     }, [props.market]);
     return (
-        <div className={styles.stockListWrapper}>
+        <div className={styles.wrapper}>
             <StockButtonList stockList={stockList} gvCallback={props.gvCallback} />
         </div>
     );

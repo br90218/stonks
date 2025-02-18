@@ -5,6 +5,7 @@ import { RunSettings } from './pages/RunSettings';
 import { GameViewOld } from './pages/GameViewOld';
 import { Loading } from './pages/Loading';
 import Intermission from './pages/Intermission';
+import GameView from './pages/GameViewNew';
 
 function App(): JSX.Element {
     return (
@@ -18,6 +19,7 @@ function App(): JSX.Element {
                     <Route path="/runsettings" element={<RunSettings />} />
                     <Route path="/gameview" element={<GameViewOld />} />
                     <Route path="/intermission" element={<Intermission />} />
+                    <Route path="/gameviewnew" element={<GameView />} />
                 </Routes>
             </HashRouter>
         </div>

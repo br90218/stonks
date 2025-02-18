@@ -1,0 +1,59 @@
+.wrapper {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid:
+    'headr headr headr headr headr headr headr headr headr headr' 1fr
+    'chart chart chart chart chart chart chart trade trade trade' 1fr
+    'chart chart chart chart chart chart chart trade trade trade' 1fr
+    'chart chart chart chart chart chart chart trade trade trade' 1fr
+    'chart chart chart chart chart chart chart trade trade trade' 1fr
+    'chart chart chart chart chart chart chart items items items' 1fr
+    'chart chart chart chart chart chart chart items items items' 1fr
+    'stock stock stock stock stock stock stock items items items' 1fr
+    'stock stock stock stock stock stock stock items items items' 1fr
+    'footr footr footr footr footr footr footr footr cntrl cntrl' 1fr
+    / 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;   
+    gap: 30px;
+    font-family: 'regular';
+}
+
+.header {
+    grid-area: headr;
+    overflow: hidden;
+}
+
+.chart {
+    grid-area: chart;
+    overflow: hidden;
+}
+
+.trade {
+    grid-area: trade;
+}
+
+.items {
+    grid-area: items;
+}
+
+.stock {
+    grid-area: stock;
+}
+
+.footer {
+    grid-area: footr;
+}
+
+.control {
+    grid-area: cntrl;
+}
+
+.header, .chart, .trade, .items, .stock, .footer, .control {
+    background-color: grey;
+    border-radius: 15px;
+}
+
+.header, .trade, .items, .stock, .footer, .control {
+    padding: 30px;
+}
+

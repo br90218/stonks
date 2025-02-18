@@ -1,13 +1,14 @@
 .stockList{
-    animation: scroll 20000ms linear infinite;
+    /* animation: scroll 20000ms linear infinite; */
+    height: 100%;
+    display: flex;
+    gap: 15px;
+    padding-inline-start: 0px;
 }
 
-.stockListWrapper{
-    height: 95%;
-    background-color: red;
+.wrapper{
+    height: 100%;
     overflow: hidden;
-    margin-left: 10px;
-    margin-right: 10px;
 }
 
 

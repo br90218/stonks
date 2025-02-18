@@ -30,6 +30,9 @@ export function MainMenu(props: PageProp): JSX.Element {
                 <Link to="/intermission">
                     <button>Intermission Page</button>
                 </Link>
+                <Link to="/gameviewnew">
+                    <button>new game view</button>
+                </Link>
             </div>
         </>
     );
