@@ -4,17 +4,18 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { fork } from 'child_process';
 import { resolve } from 'path';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
-const stockEngineChild = fork(resolve(__dirname, 'stockEngine.js'), ['stockEngine']);
+// const stockEngineChild = fork(resolve(__dirname, 'stockEngine.js'), ['stockEngine']);
+fork(resolve(__dirname, 'stockEngine.js'), ['stockEngine']);
 
-async function waitForSocketConnected(socket: Socket) {
-    while (!socket.connected) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-}
+// async function waitForSocketConnected(socket: Socket): Promise<void> {
+//     while (!socket.connected) {
+//         await new Promise((resolve) => setTimeout(resolve, 100));
+//     }
+// }
 
-function createWindow() {
+function createWindow(): BrowserWindow {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: 900,
@@ -32,6 +33,8 @@ function createWindow() {
     mainWindow.on('ready-to-show', () => {
         mainWindow.maximize();
         mainWindow.show();
+        //TODO: Debug only, remove this line
+        mainWindow.webContents.openDevTools();
     });
 
     mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -92,11 +95,11 @@ app.whenReady().then(async () => {
         return socket.connected;
     });
 
-    ipcMain.handle('command', (event, command, args) => {
+    ipcMain.handle('command', (_, command, args) => {
         socket.emit(command, args);
     });
 
-    ipcMain.handle('request', async (event, message, args) => {
+    ipcMain.handle('request', async (_, message, args) => {
         if (!socket.connected) {
             console.error('socket is not connected yet');
             return;

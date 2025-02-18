@@ -1,0 +1,19 @@
+.title {
+    font-size: 50px;
+    flex-grow: 2;    
+    vertical-align: middle;
+    font-family: 'semi-bold';
+}
+
+.detail {
+    font-size: 30px;
+    flex-grow: 1;
+    text-align: end;
+    font-family: 'regular';
+}
+
+.wrapper {
+    display: flex;
+    height: 100%;
+    align-items: center;
+}

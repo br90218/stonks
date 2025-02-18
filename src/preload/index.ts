@@ -32,7 +32,6 @@ const api = {
         return await ipcRenderer.invoke('request', 'get-cash');
     },
     startStockSim: () => {
-        console.log('frontend requested start stock sim');
         return ipcRenderer.invoke('command', 'start-stocksim');
     },
     buyStock: async (ticker: string, price: string, quantity: string) => {
@@ -55,8 +54,14 @@ const api = {
     getPlayerStock: async (tickers?: string[]) => {
         return await ipcRenderer.invoke('request', 'get-playerStock', tickers);
     },
+    getMarketStockHistory: async (ticker) => {
+        return await ipcRenderer.invoke('request', 'get-marketStock-history', [ticker]);
+    },
     setStockInfluence: (args): Promise<void> => {
         return ipcRenderer.invoke('command', 'set-stock-influence', [args[0], Number(args[1])]);
+    },
+    setStockTick: (args): Promise<void> => {
+        return ipcRenderer.invoke('command', 'set-stock-tick', [args[0], Number(args[1])]);
     }
 };
 

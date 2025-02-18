@@ -1,10 +1,4 @@
-import {
-    CallBackMessage,
-    EmptyPortfolio,
-    EmptyStockInfo,
-    Portfolio,
-    StockInfo
-} from '@renderer/data/Interface';
+import { CallBackMessage, EmptyStockInfo, Portfolio, StockInfo } from '@renderer/data/Interface';
 import styles from '@renderer/assets/css/buypanel.module.css';
 import { useEffect, useRef, useState } from 'react';
 
@@ -69,7 +63,7 @@ export function BuyPanel(props: {
     }
 
     return (
-        <div className={styles.buyPanel}>
+        <div className={styles.wrapper}>
             <div className={styles.upperPane}>
                 <div className={styles.stockInfo}>
                     <h1>{marketStockInfo.ticker}</h1>
@@ -96,7 +90,6 @@ export function BuyPanel(props: {
                     <button onClick={() => sellStock(100)}>100</button>
                 </div>
             </div>
-            <br />
         </div>
     );
 }

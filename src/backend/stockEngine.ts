@@ -1,9 +1,4 @@
-import {
-    CreateNewRunFile,
-    RetrieveRunFile,
-    RunFile,
-    SaveRunFile
-} from './services/SaveFileService';
+import { RetrieveRunFile } from './services/SaveFileService';
 
 import express from 'express';
 import { RandomGenerator } from './RandomGenerator';
@@ -21,6 +16,7 @@ import {
     startAllStockSimulation
 } from './services/MarketService';
 import { DateService } from './services/DateService';
+import { RunFile } from './services/Objects';
 
 const app = express();
 const backendServer = createServer(app);
@@ -35,20 +31,23 @@ const io = new Server(backendServer, {
 //TODO: magic number 1111
 const rng = new RandomGenerator('1111');
 
-let runFile: RunFile | null;
+let runFile: RunFile | undefined;
 
 //HACK: new market always
 const market = InstantiateMarket();
-let marketSimLoop: object;
+// let marketSimLoop: {
+//     [ticker: string]: { clear(): void };
+// };
 let dateService: DateService;
 
 function startStockEngine(): void {
     dateService = new DateService('2030-01-01');
-    marketSimLoop = startAllStockSimulation(rng, io, market, dateService);
+    // marketSimLoop = startAllStockSimulation(rng, io, market, dateService);
+    startAllStockSimulation(rng, io, market, dateService);
 }
 
 io.on('connection', (socket) => {
-    socket.on('get-runfile', (args, callback): void => {
+    socket.on('get-runfile', (_, callback): void => {
         runFile = RetrieveRunFile(true);
         callback({
             response: runFile
@@ -57,7 +56,7 @@ io.on('connection', (socket) => {
 
     socket.on('buy-stock', (args, callback): void => {
         //This should only return the updated / bought stock
-        const result = BuyStock(runFile, market, dateService, args[0], args[1], args[2]);
+        const result = BuyStock(runFile!, market, dateService, args[0], args[1], args[2]);
         callback({
             response: result
         });
@@ -65,13 +64,13 @@ io.on('connection', (socket) => {
 
     socket.on('sell-stock', (args, callback): void => {
         //This should only return the updated / bought stock
-        const result = SellStock(runFile, market, dateService, args[0], args[1], args[2]);
+        const result = SellStock(runFile!, market, dateService, args[0], args[1], args[2]);
         callback({
             response: result
         });
     });
 
-    socket.on('get-marketPortfolio', (args, callback): void => {
+    socket.on('get-marketPortfolio', (_, callback): void => {
         callback({
             response: market
         });
@@ -99,13 +98,13 @@ io.on('connection', (socket) => {
 
     socket.on('get-playerStock', (args, callback): void => {
         callback({
-            response: GetPlayerStock(runFile, args)
+            response: GetPlayerStock(runFile!, args)
         });
     });
 
-    socket.on('get-cash', (args, callback): void => {
+    socket.on('get-cash', (_, callback): void => {
         callback({
-            response: runFile.cash
+            response: runFile!.cash
         });
     });
 

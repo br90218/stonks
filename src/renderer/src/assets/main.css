@@ -26,6 +26,13 @@ code {
 #root {
   width: 100vw;
   height: 100vh;
+  align-content: center;
+}
+
+.mainWrapper {
+  height: calc(100% - 60px);
+  width: 80%;
+  margin: auto;
 }
 
 @media (max-width: 720px) {
@@ -55,4 +62,32 @@ code {
 @font-face{
   font-family: 'falling-sky-regular';
   src: url('./falling-sky-font/FallingSkyLight-K2EX.otf');
+}
+
+@font-face{
+  font-family: 'bold';
+  src: url('./fonts/Inter_24pt-Bold.ttf');
+}
+
+@font-face{
+  font-family: 'regular'; 
+  src: url('./fonts/Inter_24pt-Regular.ttf');
+}
+
+@font-face{
+  font-family: 'light';
+  src: url('./fonts/Inter_24pt-Light.ttf');
+}
+
+@font-face{
+  font-family: 'semi-bold';
+  src: url('./fonts/Inter_24pt-SemiBold.ttf');
+}
+
+.bgcolorpriceup{
+  background-color: green;
+}
+
+.bgcolorpricedown{
+  background-color: red;
 }

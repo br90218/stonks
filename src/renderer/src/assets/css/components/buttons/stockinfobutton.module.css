@@ -1,6 +1,6 @@
 
 /*TODO: I would really love to have a button with inner-rounded borders and transparent back ground*/
-.stock-info-button{
+.Button{
     border:0px transparent;
     border-radius: 10px;
     background: #223f41;
@@ -16,26 +16,28 @@
     width: 150px;
 }
 
-.stock-info-button #ticker{
+.Ticker{
     font-family: 'falling-sky-bold';
 }
 
-.stock-info-button #name{
+.Name{
     font-family: 'falling-sky-regular';
 }
 
-.stock-info-button #price{
+.Price{
     font-family: 'falling-sky-regular';
 }
 
-.price-up{
+
+/* TODO: should move the following three out into global */
+.priceUp{
     color: greenyellow;
 }
 
-.price-equal{
+.priceEqual{
     color: white;
 }
 
-.price-down{
+.priceDown{
     color:red;
 }

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
-import { RunFile } from '@renderer/data/Interface';
+import { useEffect, useState } from 'react';
 import { PageProp } from './BasicPage';
 import { RetrieveRunFile } from '@renderer/services/BackendUtility';
 
@@ -18,7 +17,7 @@ export function MainMenu(props: PageProp): JSX.Element {
     return (
         <>
             <h1>Wall Street Betssss</h1>
-            The house always winsdddd..
+            The house always wins...
             <Link to="/runsettings">
                 <button>New Run</button>
             </Link>
@@ -26,6 +25,12 @@ export function MainMenu(props: PageProp): JSX.Element {
             <Link to="/settings">
                 <button>Settings</button>
             </Link>
+            <div>
+                <h1> Test menus </h1>
+                <Link to="/intermission">
+                    <button>Intermission Page</button>
+                </Link>
+            </div>
         </>
     );
 }

@@ -1,6 +1,7 @@
 import { CallBackMessage, Portfolio, StockInfo } from '@renderer/data/Interface';
 import { StockInfoButton } from './Buttons/StockInfoButton';
 import { useEffect, useState } from 'react';
+import styles from '@renderer/assets/css/stockinfopanel.module.css';
 
 function StockButtonList(props: {
     stockList: { id: string; stock: StockInfo }[] | undefined;
@@ -18,7 +19,7 @@ function StockButtonList(props: {
     }, [props.stockList]);
 
     return (
-        <ul style={{ height: '100%', padding: '10px' }}>
+        <ul className={styles.stockList} style={{ height: '100%', padding: '10px' }}>
             {buttonsList.map((item) => {
                 return (
                     <li style={{ float: 'left', height: '100%' }} key={item.id}>
@@ -55,5 +56,9 @@ export function StockInfoPanel(props: {
         });
         setStockList(list);
     }, [props.market]);
-    return <StockButtonList stockList={stockList} gvCallback={props.gvCallback} />;
+    return (
+        <div className={styles.stockListWrapper}>
+            <StockButtonList stockList={stockList} gvCallback={props.gvCallback} />
+        </div>
+    );
 }

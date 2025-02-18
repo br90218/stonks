@@ -12,7 +12,7 @@ import { createRef, useEffect, useRef, useState } from 'react';
 export function StockChartPanel(props: {
     market: Portfolio | undefined;
     tickerToShow?: string | undefined;
-}) {
+}): JSX.Element {
     const chartContainerRef = createRef<HTMLDivElement>();
     const chartRef = useRef<IChartApi>();
     const seriesRef = useRef();
@@ -83,7 +83,6 @@ export function StockChartPanel(props: {
             return;
         }
         if (latestPriceUpdate.ticker != chartTicker) {
-            console.log(latestPriceUpdate.ticker + chartTicker);
             return;
         }
         const filtered: CandlestickData = {

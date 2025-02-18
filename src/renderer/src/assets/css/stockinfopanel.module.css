@@ -1,0 +1,21 @@
+.stockList{
+    animation: scroll 20000ms linear infinite;
+}
+
+.stockListWrapper{
+    height: 95%;
+    background-color: red;
+    overflow: hidden;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+
+@keyframes scroll {
+    0%{
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}

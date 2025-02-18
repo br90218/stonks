@@ -1,5 +1,3 @@
-import { Data } from 'electron';
-
 export interface Stock {
     ticker: string;
     name: string;

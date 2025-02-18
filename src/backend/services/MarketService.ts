@@ -1,7 +1,6 @@
 import { Server } from 'socket.io';
 import { RandomGenerator } from '../RandomGenerator';
 import {
-    MarketHistory,
     Portfolio,
     PriceDataAtTime,
     Stock,
@@ -35,7 +34,6 @@ export function GetMarketStock(marketPortfolio: Portfolio, tickers?: string[]): 
 
 export function GetPlayerStock(runFile: RunFile, tickers?: string[]): StockGetResponse {
     if (!runFile.portfolio) {
-        console.log('1');
         return {
             result: true,
             detail: 'ok',
@@ -43,8 +41,6 @@ export function GetPlayerStock(runFile: RunFile, tickers?: string[]): StockGetRe
         };
     }
     if (tickers && tickers.length > 0) {
-        console.log(runFile.portfolio);
-        console.log('2');
         const result: Portfolio = {};
         tickers.forEach((ticker) => {
             if (ticker != '') {
@@ -57,7 +53,6 @@ export function GetPlayerStock(runFile: RunFile, tickers?: string[]): StockGetRe
             data: { portfolio: result }
         };
     }
-    console.log('3');
     const portfolio = runFile.portfolio;
     return {
         result: true,
@@ -108,7 +103,9 @@ export function BuyStock(
         ),
         quantity: currentUserStock ? currentUserStock.quantity + quantity : quantity,
         tick: marketStock.tick,
-        lastUpdate: updateTime
+        lastUpdate: updateTime,
+        directionInfluence: marketStock.directionInfluence,
+        history: marketStock.history
     };
 
     const updatedMarketStock: Stock = {
@@ -120,7 +117,9 @@ export function BuyStock(
         delta: marketStock.delta,
         deltaPercentage: marketStock.deltaPercentage,
         lastDelta: marketStock.lastDelta,
-        lastUpdate: updateTime
+        lastUpdate: updateTime,
+        directionInfluence: marketStock.directionInfluence,
+        history: marketStock.history
     };
     runFile.portfolio[ticker] = updatedUserStock;
     marketStock[ticker] = updatedMarketStock;
@@ -167,10 +166,10 @@ export function SellStock(
         currPrice: portfolioStock.currPrice,
         quantity: portfolioStock.quantity - quantity,
         tick: marketStock.tick,
-        lastUpdate: updateTime
+        lastUpdate: updateTime,
+        directionInfluence: marketStock.directionInfluence,
+        history: marketStock.history
     };
-
-    console.log(portfolioStock.quantity - quantity);
 
     const updatedMarketStock: Stock = {
         ticker: marketStock.ticker,
@@ -181,7 +180,9 @@ export function SellStock(
         delta: marketStock.delta,
         deltaPercentage: marketStock.deltaPercentage,
         lastDelta: marketStock.lastDelta,
-        lastUpdate: updateTime
+        lastUpdate: updateTime,
+        directionInfluence: marketStock.directionInfluence,
+        history: marketStock.history
     };
     runFile.portfolio[ticker] = updatedUserStock;
     marketStock[ticker] = updatedMarketStock;
@@ -207,19 +208,23 @@ export function InstantiateMarket(): Portfolio {
     return DefaultMarketPortfolio();
 }
 
-export function LoadMarket(): Portfolio {
-    let marketPf: Portfolio;
+// export function LoadMarket(): Portfolio {
+//     let marketPf: Portfolio;
 
-    return marketPf;
-}
+//     return marketPf;
+// }
 
 export function startAllStockSimulation(
     rng: RandomGenerator,
     io: Server,
     market: Portfolio,
     dateService: DateService
-): object {
-    const stockSimulationLoops = {};
+): {
+    [ticker: string]: { clear(): void };
+} {
+    const stockSimulationLoops: {
+        [ticker: string]: { clear(): void };
+    } = {};
 
     Object.keys(market).forEach((ticker) => {
         stockSimulationLoops[ticker] = StockSimulationLoop(rng, io, ticker, market, dateService);
@@ -241,7 +246,7 @@ export function stopStockSimulation(stockSimulationLoops: object, ticker: string
     return stockSimulationLoops;
 }
 
-export function GetMarketStockHistory(market: Portfolio, ticker: string) {
+export function GetMarketStockHistory(market: Portfolio, ticker: string): PriceDataAtTime[] {
     return market[ticker].history;
 }
 
@@ -249,7 +254,6 @@ export function GetMarketStockHistory(market: Portfolio, ticker: string) {
 export function AddInfluenceToStock(market: Portfolio, ticker: string, influence: number): void {
     const newStock = ReturnStockCopy(market[ticker]);
     newStock.directionInfluence = Math.max(0, Math.min(newStock.directionInfluence + influence, 1));
-    console.log(newStock.directionInfluence);
     market[ticker] = newStock;
 }
 
@@ -266,7 +270,7 @@ function StockSimulationLoop(
     ticker: string,
     market: Portfolio,
     dateService: DateService
-) {
+): { clear(): void } {
     return rng.randomInterval(
         () => {
             const stock = market[ticker];
@@ -365,13 +369,13 @@ function AddNewPriceData(
     return history;
 }
 
-function NewMarketHistory(market: Portfolio): MarketHistory {
-    const history = {};
-    Object.keys(market).forEach((ticker) => {
-        history[ticker] = { ticker: ticker, priceHistory: [] };
-    });
-    return history;
-}
+// function NewMarketHistory(market: Portfolio): MarketHistory {
+//     const history = {};
+//     Object.keys(market).forEach((ticker) => {
+//         history[ticker] = { ticker: ticker, priceHistory: [] };
+//     });
+//     return history;
+// }
 //TODO: I don't like this, but i'm tired of dealing with I/O from file at this point.
 const DefaultMarketPortfolio = function (): Portfolio {
     const stocks = {};

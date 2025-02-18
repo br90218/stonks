@@ -7,7 +7,7 @@ import { RunFile } from './Objects';
 //This will break, not to mention it isn't safe.
 const SAVEDIR = homedir() + '\\Documents\\stonk balatro\\runfile.json';
 
-export function RetrieveRunFile(offline = false): RunFile | null {
+export function RetrieveRunFile(offline = false): RunFile | undefined {
     if (offline) {
         let runFileJSON: string = '';
         try {
@@ -16,7 +16,6 @@ export function RetrieveRunFile(offline = false): RunFile | null {
             console.error(err);
         }
         if (runFileJSON != '') {
-            console.log('runfile found');
             const jsonObject = JSON.parse(runFileJSON);
             const runFile: RunFile = {
                 name: jsonObject.name,
@@ -26,11 +25,11 @@ export function RetrieveRunFile(offline = false): RunFile | null {
             };
             return runFile;
         }
-        return null;
+        return undefined;
     } else {
         //TODO: no online save yet.
         console.error('not implemented');
-        return null;
+        return undefined;
     }
 }
 
@@ -40,7 +39,8 @@ export function RetrieveRunFile(offline = false): RunFile | null {
 export function CreateNewRunFile(name: string, seed: string): RunFile {
     const runFile: RunFile = {
         name: name,
-        seed: seed
+        seed: seed,
+        cash: 100000
     };
 
     return runFile;

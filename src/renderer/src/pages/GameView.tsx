@@ -128,28 +128,22 @@ export function GameView(): JSX.Element {
             <div className={styles.header}>
                 <NewsFlashPanel />
             </div>
-            <div className={styles.main}>
-                <div className={styles.mainLeft}>
-                    <div className={styles.chart}>
-                        <StockChartPanel market={market} tickerToShow={selectedTicker} />
-                    </div>
-                    <div className={styles.info}>
-                        <StockInfoPanel market={market} gvCallback={handleChildCallback} />
-                    </div>
-                </div>
-                <div className={styles.mainRight}>
-                    <div className={styles.buypanel}>
-                        <BuyPanel
-                            tickerToShow={selectedTicker}
-                            marketStockInfo={latestStockInfo}
-                            playerStockPortfolio={latestPlayerStockPortfolioGET}
-                            gvCallback={handleChildCallback}
-                        />
-                    </div>
-                    <div className={styles.inventory}>
-                        <InventoryPanel />
-                    </div>
-                </div>
+            <div className={styles.chart}>
+                <StockChartPanel market={market} tickerToShow={selectedTicker} />
+            </div>
+            <div className={styles.info}>
+                <StockInfoPanel market={market} gvCallback={handleChildCallback} />
+            </div>
+            <div className={styles.buypanel}>
+                <BuyPanel
+                    tickerToShow={selectedTicker}
+                    marketStockInfo={latestStockInfo}
+                    playerStockPortfolio={latestPlayerStockPortfolioGET}
+                    gvCallback={handleChildCallback}
+                />
+            </div>
+            <div className={styles.inventory}>
+                <InventoryPanel />
             </div>
             <div className={styles.footer}>
                 <StatusPanel cash={10000} />

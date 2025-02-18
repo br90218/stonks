@@ -1,0 +1,34 @@
+.wrapper{
+    padding: 15px;
+    font-family: 'regular';
+    height: 100%;
+    vertical-align: middle;
+}
+
+.nextquarteris{
+    font-size: 40px;
+    flex-grow:1;
+    height: fit-content;
+}
+
+.nextquarter{
+    font-size: 120px;
+    font-family: 'semi-bold';
+    flex-grow:1;
+    height: fit-content;
+}
+
+.modifiers{
+    font-size:20px;
+    flex-grow:1
+}
+
+.proceed{
+    width: 100%;
+    height: 80px;
+    border-radius: 15px;
+    border: 0px;
+    flex-grow: 1;
+    background-color: greenyellow;
+    bottom: 0px;
+}
