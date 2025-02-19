@@ -13,7 +13,9 @@ function FuturesItem(): JSX.Element {
 export default function FuturesPanel(): JSX.Element {
     return (
         <div className={styles.wrapper}>
-            <div className={styles.banner}>This is futures</div>
+            <div className={styles.banner}>
+                <h1>Futures</h1>
+            </div>
             <div className={styles.list}>
                 <FuturesItem />
                 <FuturesItem />

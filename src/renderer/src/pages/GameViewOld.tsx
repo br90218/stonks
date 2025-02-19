@@ -1,6 +1,5 @@
 import { BuyPanel } from '@renderer/components/BuyPanel';
 import { NewsFlashPanel } from '@renderer/components/NewsFlashPanel';
-import { StatusPanel } from '@renderer/components/StatusPanel';
 import { StockChartPanel } from '@renderer/components/StockChartPanel';
 import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
 import {
@@ -19,7 +18,7 @@ import { useEffect, useState } from 'react';
 import styles from '@renderer/assets/css/gameview.module.css';
 import { InventoryPanel } from '@renderer/components/InventoryPanel';
 
-export function GameView(): JSX.Element {
+export function GameViewOld(): JSX.Element {
     const [market, setMarket] = useState<Portfolio>();
     const [selectedTicker, setSelectedTicker] = useState<string>('NVDA');
     const [latestStockInfo, setLatestStockInfo] = useState<StockInfo>(LoadingStockInfo());
@@ -145,9 +144,7 @@ export function GameView(): JSX.Element {
             <div className={styles.inventory}>
                 <InventoryPanel />
             </div>
-            <div className={styles.footer}>
-                <StatusPanel cash={10000} />
-            </div>
+            <div className={styles.footer}></div>
         </div>
     );
 }

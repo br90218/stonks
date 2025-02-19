@@ -1,12 +1,12 @@
 .title {
-    font-size: 50px;
+    font-size: 1.5vmin;
     flex-grow: 2;    
     vertical-align: middle;
     font-family: 'semi-bold';
 }
 
 .detail {
-    font-size: 30px;
+    font-size: 2vh;
     flex-grow: 1;
     text-align: end;
     font-family: 'regular';

@@ -1,19 +1,33 @@
-.newsflash{
-    animation: newsflash;
-    animation-duration: 10s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-    animation-play-state: running;
+.wrapper{
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    gap: 5em;
+    justify-content: space-between;
+    overflow: hidden;
+
 }
 
-
-@keyframes newsflash {
-    from {
-        transform: translateX(0%);
-
-    }
-    to {
-        transform: translateX(100%);
-    }
+.front, .back{
+    font-size: 30px;
+    flex-shrink: 0;
+    animation: transition 5000ms infinite linear;
 }
 
+@keyframes transition{
+    0%{
+        transform: translateY(100%);
+    }
+    20%{
+        transform: translateY(0%);
+    }
+
+    80%{
+        opacity: 1;
+    }
+
+    100%{
+        opacity: 0;
+    }
+}

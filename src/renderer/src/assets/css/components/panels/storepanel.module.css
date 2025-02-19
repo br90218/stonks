@@ -7,24 +7,22 @@
 .banner {
     flex-direction: column;
     display: flex;
-    width: 25%;
-    padding-left: 15px;
 }
 
 .catalogue{
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap: 30px;
+    gap: 2vh;
     width: 75%;
 }
 
 .title {
     font-family: 'semi-bold';
-    font-size: 30px;
+    font-size: 2vmin;
 }
 
 .subtitle {
     font-family: 'regular';
-    font-size: 24px;
+    font-size: 2vh;
 }

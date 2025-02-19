@@ -18,8 +18,8 @@ fork(resolve(__dirname, 'stockEngine.js'), ['stockEngine']);
 function createWindow(): BrowserWindow {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 900,
-        height: 670,
+        minWidth: 1280,
+        minHeight: 720,
         show: false,
         autoHideMenuBar: true,
         ...(process.platform === 'linux' ? { icon } : {}),
@@ -29,6 +29,8 @@ function createWindow(): BrowserWindow {
             // contextIsolation: false
         }
     });
+
+    mainWindow.setMinimumSize(1280, 720);
 
     mainWindow.on('ready-to-show', () => {
         mainWindow.maximize();

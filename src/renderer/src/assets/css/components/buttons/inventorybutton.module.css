@@ -1,0 +1,30 @@
+.button {
+    display: flex;
+    align-items: center;
+    height: 7vh;
+    border-radius: 1vh;
+    border: 0px;
+    width: 100%;
+    margin-top: 1vh;
+}
+
+.image {
+    flex-grow: 1;
+    width: 8vh;
+}
+
+.image img {
+    height: 3vh;
+    aspect-ratio: 1;
+}
+
+.words {
+    text-align: left;
+    flex-grow: 4;
+    font-size: 1vh;
+    margin-right: 1vh;
+}
+
+.title {
+    font-family: 'semi-bold'
+}

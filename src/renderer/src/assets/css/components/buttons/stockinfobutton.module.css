@@ -1,31 +1,37 @@
-
-/*TODO: I would really love to have a button with inner-rounded borders and transparent back ground*/
 .Button{
-    border:0px transparent;
-    border-radius: 10px;
-    background: #223f41;
-    font-size: 25px;
+    border: 0px;
+    border-radius: 1vh;
+    background: hsl(184, 31%, 19%);
+    font-size: 1.5vmin;
     text-align: left;
     color: white;
-    font-family: monospace;
-    padding: 10px;
-    margin-left: 5px;
-    margin-right: 5px;
+    font-family: 'regular';
+    padding: 1vh;
     height: 100%;
     overflow: hidden;
-    width: 150px;
+    width: 12vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .Ticker{
-    font-family: 'falling-sky-bold';
+    font-family: 'bold';
 }
 
 .Name{
-    font-family: 'falling-sky-regular';
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .Price{
-    font-family: 'falling-sky-regular';
+}
+
+.textWrapper{
+    margin-right: 1vh;
+    overflow: hidden;
+    max-width: 100%;
 }
 
 
@@ -40,4 +46,12 @@
 
 .priceDown{
     color:red;
+}
+
+.Button:hover{
+    background: #999999;
+}
+
+.Button:active{
+    background: #222222;
 }
