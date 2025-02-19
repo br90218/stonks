@@ -16,7 +16,7 @@ export function MainMenu(props: PageProp): JSX.Element {
 
     return (
         <>
-            <h1>Wall Street Betssss</h1>
+            <h1 className="font_mainTitle">Wall Street Betssss</h1>
             The house always wins...
             <Link to="/runsettings">
                 <button>New Run</button>

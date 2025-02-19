@@ -1,18 +1,15 @@
-
-/*TODO: I would really love to have a button with inner-rounded borders and transparent back ground*/
 .Button{
     border: 0px;
-    border-radius: 10px;
-    background: #223f41;
-    font-size: 25px;
+    border-radius: 1vh;
+    background: hsl(184, 31%, 19%);
+    font-size: 1.5vmin;
     text-align: left;
     color: white;
     font-family: 'regular';
-    padding: 10px;
-    border-right: 10px solid #223f41;
+    padding: 1vh;
     height: 100%;
     overflow: hidden;
-    width: 150px;
+    width: 12vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -24,10 +21,17 @@
 
 .Name{
     white-space: nowrap;
+    max-width: 100%;
     overflow: hidden;
 }
 
 .Price{
+}
+
+.textWrapper{
+    margin-right: 1vh;
+    overflow: hidden;
+    max-width: 100%;
 }
 
 

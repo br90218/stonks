@@ -1,6 +1,12 @@
 import styles from '@renderer/assets/css/pages/gameview.module.css';
+import { BuyPanel } from '@renderer/components/BuyPanel';
+import { InventoryPanel } from '@renderer/components/InventoryPanel';
 import { NewsFlashPanel } from '@renderer/components/NewsFlashPanel';
+import ControlsPanel from '@renderer/components/Panels/controlspanel';
+import StatusPanel from '@renderer/components/Panels/StatusPanel';
+import { StockChartPanel } from '@renderer/components/StockChartPanel';
 import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
+import { CallBackMessage } from '@renderer/data/Interface';
 
 export default function GameView(): JSX.Element {
     return (
@@ -8,14 +14,35 @@ export default function GameView(): JSX.Element {
             <div className={styles.header}>
                 <NewsFlashPanel />
             </div>
-            <div className={styles.chart}></div>
-            <div className={styles.stock}>
-                <StockInfoPanel />
+            <div className={styles.chart}>
+                <StockChartPanel market={undefined} />
             </div>
-            <div className={styles.trade}></div>
-            <div className={styles.items}></div>
-            <div className={styles.footer}></div>
-            <div className={styles.control}></div>
+            <div className={styles.stock}>
+                <StockInfoPanel
+                    gvCallback={function (childData: { msgType: string; arg?: string[] }): void {
+                        throw new Error('Function not implemented.');
+                    }}
+                />
+            </div>
+            <div className={styles.trade}>
+                <BuyPanel
+                    tickerToShow={''}
+                    marketStockInfo={undefined}
+                    playerStockPortfolio={undefined}
+                    gvCallback={function (childData: CallBackMessage): void {
+                        throw new Error('Function not implemented.');
+                    }}
+                />
+            </div>
+            <div className={styles.items}>
+                <InventoryPanel />
+            </div>
+            <div className={styles.footer}>
+                <StatusPanel />
+            </div>
+            <div className={styles.control}>
+                <ControlsPanel />
+            </div>
         </div>
     );
 }

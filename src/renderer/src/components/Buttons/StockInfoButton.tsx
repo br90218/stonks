@@ -32,10 +32,12 @@ export function StockInfoButton(props: {
 
     return (
         <button className={styles.Button} onClick={selectTicker}>
-            <h2 className={styles.Ticker}>{stock?.ticker}</h2>
-            <div className={styles.Name}>{stock?.name}</div>
-            <div className={`${styles.Price} ${direction}`}>{stock?.currPrice.toFixed(2)}</div>
-            <div>+100%</div>
+            <div className={styles.textWrapper}>
+                <h2 className={styles.Ticker}>{stock?.ticker}</h2>
+                <div className={styles.Name}>{stock?.name}</div>
+                <div className={`${styles.Price} ${direction}`}>{stock?.currPrice.toFixed(2)}</div>
+                <div>+100%</div>
+            </div>
         </button>
     );
 }

@@ -7,37 +7,39 @@
 .banner {
     flex-grow: 1;
     align-items: center;
+    font-family: 'semi-bold';
+    font-size: 1.5vmin;
 }
 
 .list {
     flex-grow: 3;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 2vh;
 }
 
 .futuresitem{
     background-color: rgb(85, 85, 85);
     width: 100%;
-    height: 100px;
-    max-height: 100px;
-    border-radius: 15px;
-    padding: 15px;
+    flex-grow: 1;
+    border-radius: 1vh;
+    padding: 1vh;
     font-family: 'regular';
     display: flex;
-    gap: 15px;
+    gap: 1vh;
     align-items: center;
 }
 
 .ticker{
     flex-grow:1;
-    font-size: 25px;
+    font-size: 1.5vmin;
 }
 
 .direction{
     flex-grow:1;
     height: 100%;
-    font-size: 20px;
-    border-radius: 15px;
+    width: 30%;
+    font-size: 1.5vmin;
+    border-radius: 1vh;
     border: 0px;
 }

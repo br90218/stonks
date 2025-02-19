@@ -14,7 +14,7 @@
     'stock stock stock stock stock stock stock items items items' 1fr
     'footr footr footr footr footr footr footr footr cntrl cntrl' 1fr
     / 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;   
-    gap: 30px;
+    gap: 2vh;
     font-family: 'regular';
 }
 
@@ -50,10 +50,10 @@
 
 .header, .chart, .trade, .items, .stock, .footer, .control {
     background-color: grey;
-    border-radius: 15px;
+    border-radius: 1vh;
 }
 
 .header, .trade, .items, .stock, .footer, .control {
-    padding: 30px;
+    padding: 1vw;
 }
 

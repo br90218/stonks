@@ -12,4 +12,22 @@
 .front, .back{
     font-size: 30px;
     flex-shrink: 0;
+    animation: transition 5000ms infinite linear;
+}
+
+@keyframes transition{
+    0%{
+        transform: translateY(100%);
+    }
+    20%{
+        transform: translateY(0%);
+    }
+
+    80%{
+        opacity: 1;
+    }
+
+    100%{
+        opacity: 0;
+    }
 }

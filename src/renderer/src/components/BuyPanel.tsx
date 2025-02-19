@@ -71,23 +71,46 @@ export function BuyPanel(props: {
                 </div>
                 <div className={styles.priceInfo}>
                     <h1>{marketStockInfo.currPrice.toFixed(2)}</h1>
+                    <p>+999%</p>
                 </div>
             </div>
             <div className={styles.lowerPane}>
                 <div className={styles.buyColumn}>
                     <h1>Buy</h1>
-                    <button onClick={() => buyStock(1)}>1</button>
-                    <button onClick={() => buyStock(10)}>10</button>
-                    <button onClick={() => buyStock(100)}>100</button>
+                    <button className={styles.buyButton} onClick={() => buyStock(1)}>
+                        1
+                    </button>
+                    <button className={styles.buyButton} onClick={() => buyStock(10)}>
+                        10
+                    </button>
+                    <button className={styles.buyButton} onClick={() => buyStock(100)}>
+                        100
+                    </button>
                 </div>
                 <div className={styles.portfolioColumn}>
-                    <h1>Shares: {playerStockInfoToDisplay.quantity}</h1>
+                    <div>
+                        <h1>Positions:</h1>
+                    </div>
+                    <div className={styles.positionInfoRow}>
+                        <div className={styles.positionInfoElementL}>Long:</div>
+                        <div className={styles.positionInfoElementR}>50000 shares</div>
+                    </div>
+                    <div className={styles.positionInfoRow}>
+                        <div>Short:</div>
+                        <div>50000 shares</div>
+                    </div>
                 </div>
                 <div className={styles.sellColumn}>
                     <h1>Sell</h1>
-                    <button onClick={() => sellStock(1)}>1</button>
-                    <button onClick={() => sellStock(10)}>10</button>
-                    <button onClick={() => sellStock(100)}>100</button>
+                    <button className={styles.buyButton} onClick={() => sellStock(1)}>
+                        1
+                    </button>
+                    <button className={styles.buyButton} onClick={() => sellStock(10)}>
+                        10
+                    </button>
+                    <button className={styles.buyButton} onClick={() => sellStock(100)}>
+                        100
+                    </button>
                 </div>
             </div>
         </div>

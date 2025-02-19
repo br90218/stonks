@@ -1,6 +1,5 @@
 import { BuyPanel } from '@renderer/components/BuyPanel';
 import { NewsFlashPanel } from '@renderer/components/NewsFlashPanel';
-import { StatusPanel } from '@renderer/components/StatusPanel';
 import { StockChartPanel } from '@renderer/components/StockChartPanel';
 import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
 import {
@@ -145,9 +144,7 @@ export function GameViewOld(): JSX.Element {
             <div className={styles.inventory}>
                 <InventoryPanel />
             </div>
-            <div className={styles.footer}>
-                <StatusPanel cash={10000} />
-            </div>
+            <div className={styles.footer}></div>
         </div>
     );
 }

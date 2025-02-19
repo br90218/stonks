@@ -3,7 +3,9 @@ import styles from '@renderer/assets/css/components/panels/nextquarterpanel.modu
 export default function NextQuarterPanel(): JSX.Element {
     return (
         <div className={styles.wrapper}>
-            <div className={styles.nextquarteris}>Next Quarter:</div>
+            <div className={styles.nextquarteris}>
+                <h1>Next Quarter:</h1>
+            </div>
             <div className={styles.nextquarter}>Q3</div>
             <div className={styles.modifiers}>
                 <ul>
