@@ -1,26 +1,44 @@
 export interface Stock {
     ticker: string;
     name: string;
+}
+
+export interface MarketStock extends Stock {
     currPrice: number;
-    quantity: number; //NOTE: i would actually like to separate SHARE from STOCK. quantity should not be here.
-    delta?: number;
-    deltaPercentage?: number;
-    lastDelta?: number;
+    delta: number;
+    deltaPercentage: number;
+    lastDelta: number;
     tick: number;
     lastUpdate: string;
-    directionInfluence: number;
+    influenceDirection: number;
     history: PriceDataAtTime[];
+}
+
+export interface PlayerPosition extends Stock {
+    isLongPosition: boolean;
+    averagePrice: number;
+    quantity: number;
 }
 
 export interface RunFile {
     name: string;
     seed: string;
-    portfolio?: Portfolio;
+    portfolio?: PlayerPortfolio;
     cash: number;
+    clearance: string[];
+}
+
+export interface PlayerPortfolio {
+    shortPosition: Portfolio;
+    longPosition: Portfolio;
 }
 
 export interface Portfolio {
-    [ticker: string]: Stock;
+    stocks: { [ticker: string]: Stock };
+}
+
+export interface MarketPortfolio extends Portfolio {
+    stocks: { [ticker: string]: MarketStock };
 }
 
 export interface MarketHistory {
@@ -33,10 +51,6 @@ export interface StockHistory {
 
 export interface PriceDataAtTime {
     time: string;
-    price: OHLC;
-}
-
-interface OHLC {
     open: number;
     high: number;
     low: number;
