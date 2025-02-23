@@ -1,6 +1,9 @@
 import { Server } from 'socket.io';
 import { RandomGenerator } from '../RandomGenerator';
 import {
+    MarketPortfolio,
+    MarketStock,
+    PlayerPosition,
     Portfolio,
     PriceDataAtTime,
     Stock,
@@ -10,60 +13,66 @@ import {
 import { RunFile } from './Objects';
 import { DateService } from './DateService';
 
-export function GetMarketStock(marketPortfolio: Portfolio, tickers?: string[]): StockGetResponse {
+export function GetMarketStock(
+    marketPortfolio: MarketPortfolio,
+    tickers?: string[]
+): StockGetResponse {
+    const result: MarketStock[] = [];
+
     if (tickers && tickers.length > 0) {
-        const result: Portfolio = {};
         tickers.forEach((ticker) => {
-            if (ticker != '') {
-                result[ticker] = marketPortfolio[ticker];
-            }
+            result.push(marketPortfolio.stocks[ticker]);
         });
-        return {
-            result: true,
-            detail: 'ok',
-            data: { portfolio: result }
-        };
+    } else {
+        Object.keys(marketPortfolio.stocks).forEach((ticker) => {
+            result.push(marketPortfolio.stocks[ticker]);
+        });
     }
-    const portfolio = marketPortfolio;
     return {
         result: true,
         detail: 'ok',
-        data: { portfolio: portfolio }
+        data: { stocks: result }
     };
 }
 
 export function GetPlayerStock(runFile: RunFile, tickers?: string[]): StockGetResponse {
     if (!runFile.portfolio) {
         return {
-            result: true,
-            detail: 'ok',
-            data: { portfolio: {} }
+            result: false,
+            detail: 'no-portfolio',
+            data: undefined
         };
     }
+    const playerLongPositions = runFile.portfolio.longPosition;
+    const playerShortPositions = runFile.portfolio.shortPosition;
+    const stocks: Stock[] = [];
     if (tickers && tickers.length > 0) {
-        const result: Portfolio = {};
         tickers.forEach((ticker) => {
-            if (ticker != '') {
-                result[ticker] = runFile.portfolio![ticker];
+            if (playerLongPositions[ticker]) {
+                stocks.push(playerLongPositions[ticker]);
+            }
+            if (playerShortPositions[ticker]) {
+                stocks.push(playerShortPositions[ticker]);
             }
         });
-        return {
-            result: true,
-            detail: 'ok',
-            data: { portfolio: result }
-        };
+    } else {
+        Object.keys(playerLongPositions).forEach((ticker) => {
+            stocks.push(playerLongPositions[ticker]);
+        });
+        Object.keys(playerShortPositions).forEach((ticker) => {
+            stocks.push(playerShortPositions[ticker]);
+        });
     }
-    const portfolio = runFile.portfolio;
     return {
         result: true,
         detail: 'ok',
-        data: { portfolio: portfolio }
+        data: { stocks: stocks }
     };
 }
 
 export function BuyStock(
     runFile: RunFile,
-    market: Portfolio,
+    market: MarketPortfolio,
     dateService: DateService,
     ticker: string,
     price: number,
@@ -84,45 +93,27 @@ export function BuyStock(
         return { result: false, detail: 'insufficient-cash' };
     }
 
-    //NOTE: this buying mechanism assumes no slippage;
+    //NOTE: buying assumes no slippage;
     // it also means that orders will be fulfilled regardless
     // of the quoted price.
 
-    const currentUserStock = runFile.portfolio[ticker];
-    const marketStock = market[ticker];
-    const updateTime = dateService.ParseDate();
+    const currentUserStock = runFile.portfolio.longPosition[ticker];
+    const stockName = market.stocks[ticker].name;
 
-    const updatedUserStock: Stock = {
+    const updatedUserStock: PlayerPosition = {
         ticker: ticker,
-        name: currentUserStock ? currentUserStock.name : marketStock.name,
-        currPrice: calculateAveragePrice(
+        name: currentUserStock ? currentUserStock.name : stockName,
+        averagePrice: calculateAveragePrice(
             currentUserStock ? currentUserStock.currPrice : 0,
             currentUserStock ? currentUserStock.quantity : 0,
             price,
             quantity
         ),
         quantity: currentUserStock ? currentUserStock.quantity + quantity : quantity,
-        tick: marketStock.tick,
-        lastUpdate: updateTime,
-        directionInfluence: marketStock.directionInfluence,
-        history: marketStock.history
+        isLongPosition: true
     };
 
-    const updatedMarketStock: Stock = {
-        ticker: marketStock.ticker,
-        name: marketStock.name,
-        currPrice: marketStock.currPrice,
-        quantity: marketStock.quantity - quantity,
-        tick: marketStock.tick,
-        delta: marketStock.delta,
-        deltaPercentage: marketStock.deltaPercentage,
-        lastDelta: marketStock.lastDelta,
-        lastUpdate: updateTime,
-        directionInfluence: marketStock.directionInfluence,
-        history: marketStock.history
-    };
-    runFile.portfolio[ticker] = updatedUserStock;
-    marketStock[ticker] = updatedMarketStock;
+    runFile.portfolio.longPosition[ticker] = updatedUserStock;
     runFile.cash -= quantity * price;
 
     return {
@@ -133,6 +124,117 @@ export function BuyStock(
 }
 
 export function SellStock(
+    runFile: RunFile,
+    market: MarketPortfolio,
+    dateService: DateService,
+    ticker: string,
+    price: number,
+    quantity: number
+): StockOperationResponse {
+    if (!runFile || !runFile.portfolio) {
+        console.error(
+            `did not supply runFile or runFile portfolio does not exist when selling stock`
+        );
+        return { result: false, detail: 'runFile-error' };
+    }
+    if (!market || !dateService) {
+        console.error(`did not supply market or dateService when selling stock`);
+        return { result: false, detail: 'internal-error' };
+    }
+
+    const playerPosition = runFile.portfolio.longPosition[ticker];
+
+    if (!playerPosition || playerPosition.quantity < quantity) {
+        return { result: false, detail: 'insufficient-stock' };
+    }
+
+    if (quantity == playerPosition.quantity) {
+        delete runFile.portfolio.longPosition[ticker];
+    } else {
+        const updatedUserStock: PlayerPosition = {
+            ticker: ticker,
+            name: playerPosition.name,
+            quantity: playerPosition.quantity - quantity,
+            isLongPosition: true,
+            averagePrice: playerPosition.averagePrice
+        };
+        runFile.portfolio.longPosition[ticker] = updatedUserStock;
+    }
+
+    runFile.cash += quantity * price;
+    return {
+        result: true,
+        detail: 'ok',
+        data: {
+            newRemainingCash: runFile.cash,
+            stock: runFile.portfolio.longPosition[ticker] ?? undefined
+        }
+    };
+}
+
+export function ShortStock(
+    runFile: RunFile,
+    market: MarketPortfolio,
+    dateService: DateService,
+    ticker: string,
+    price: number,
+    quantity: number
+): StockOperationResponse {
+    if (!runFile || !runFile.portfolio) {
+        console.error(
+            `did not supply runFile or runFile portfolio does not exist when buying stock`
+        );
+        return { result: false, detail: 'runFile-error' };
+    }
+    if (!market || !dateService) {
+        console.error(`did not supply market or dateService when buying stock`);
+        return { result: false, detail: 'internal-error' };
+    }
+
+    if (runFile.cash < price * quantity) {
+        return { result: false, detail: 'insufficient-cash' };
+    }
+
+    const shortPositionExists = runFile.portfolio.shortPosition.stocks[ticker] != undefined;
+    const stockName = market.stocks[ticker].name;
+
+    if (shortPositionExists) {
+        const currentPosition = runFile.portfolio.shortPosition.stocks[ticker] as PlayerPosition;
+        const newAveragePrice =
+            (currentPosition.quantity * currentPosition.averagePrice + quantity * price) /
+            (quantity + currentPosition.quantity);
+
+        const newPosition: PlayerPosition = {
+            ticker: ticker,
+            name: stockName,
+            quantity: quantity + currentPosition.quantity,
+            averagePrice: newAveragePrice,
+            isLongPosition: false
+        };
+        runFile.portfolio.shortPosition[ticker] = newPosition;
+    } else {
+        const newPosition: PlayerPosition = {
+            ticker: ticker,
+            name: stockName,
+            quantity: quantity,
+            averagePrice: price,
+            isLongPosition: false
+        };
+        runFile.portfolio.shortPosition[ticker] = newPosition;
+    }
+    runFile.cash = runFile.cash + quantity * price;
+
+    return {
+        result: true,
+        detail: 'ok',
+        data: {
+            newRemainingCash: runFile.cash,
+            stock: runFile.portfolio.shortPosition[ticker]
+        }
+    };
+}
+
+export function BuybackStock(
     runFile: RunFile,
     market: Portfolio,
     dateService: DateService,
@@ -151,47 +253,38 @@ export function SellStock(
         return { result: false, detail: 'internal-error' };
     }
 
-    const portfolioStock = runFile.portfolio[ticker];
+    const playerPosition: PlayerPosition = runFile.portfolio.shortPosition[ticker];
 
-    if (!portfolioStock || portfolioStock.quantity < quantity) {
-        return { result: false, detail: 'insufficient-stock' };
+    if (!playerPosition || playerPosition.quantity < quantity) {
+        console.error(`player has not enough position`);
+        return { result: false, detail: 'insufficient-quantity' };
     }
 
-    const marketStock = market[ticker];
-    const updateTime = dateService.ParseDate();
+    if (quantity * price > runFile.cash) {
+        console.error(`player has not enough cash`);
+        return { result: false, detail: 'insufficient-cash' };
+    }
 
-    const updatedUserStock: Stock = {
-        ticker: ticker,
-        name: portfolioStock.name,
-        currPrice: portfolioStock.currPrice,
-        quantity: portfolioStock.quantity - quantity,
-        tick: marketStock.tick,
-        lastUpdate: updateTime,
-        directionInfluence: marketStock.directionInfluence,
-        history: marketStock.history
-    };
-
-    const updatedMarketStock: Stock = {
-        ticker: marketStock.ticker,
-        name: marketStock.name,
-        currPrice: marketStock.currPrice,
-        quantity: marketStock.quantity + quantity,
-        tick: marketStock.tick,
-        delta: marketStock.delta,
-        deltaPercentage: marketStock.deltaPercentage,
-        lastDelta: marketStock.lastDelta,
-        lastUpdate: updateTime,
-        directionInfluence: marketStock.directionInfluence,
-        history: marketStock.history
-    };
-    runFile.portfolio[ticker] = updatedUserStock;
-    marketStock[ticker] = updatedMarketStock;
-    runFile.cash += quantity * price;
-
+    if (playerPosition.quantity == quantity) {
+        delete runFile.portfolio.shortPosition[ticker];
+    } else {
+        const updatedPosition: PlayerPosition = {
+            isLongPosition: false,
+            averagePrice: playerPosition.averagePrice,
+            quantity: playerPosition.quantity - quantity,
+            ticker: ticker,
+            name: playerPosition.name
+        };
+        runFile.portfolio.shortPosition[ticker] = updatedPosition;
+    }
+    runFile.cash = runFile.cash - quantity * price;
     return {
         result: true,
         detail: 'ok',
-        data: { newRemainingCash: runFile.cash, stock: updatedUserStock }
+        data: {
+            newRemainingCash: runFile.cash,
+            stock: runFile.portfolio.shortPosition[ticker] ?? undefined
+        }
     };
 }
 
@@ -217,7 +310,7 @@ export function InstantiateMarket(): Portfolio {
 export function startAllStockSimulation(
     rng: RandomGenerator,
     io: Server,
-    market: Portfolio,
+    market: MarketPortfolio,
     dateService: DateService
 ): {
     [ticker: string]: { clear(): void };
@@ -251,15 +344,19 @@ export function GetMarketStockHistory(market: Portfolio, ticker: string): PriceD
 }
 
 //TODO: does not catch exception when market[ticker] returns jackshit
-export function AddInfluenceToStock(market: Portfolio, ticker: string, influence: number): void {
-    const newStock = ReturnStockCopy(market[ticker]);
-    newStock.directionInfluence = Math.max(0, Math.min(newStock.directionInfluence + influence, 1));
+export function AddInfluenceToStock(
+    market: MarketPortfolio,
+    ticker: string,
+    influence: number
+): void {
+    const newStock = MakeMarketStockCopy(market[ticker]);
+    newStock.influenceDirection = Math.max(0, Math.min(newStock.influenceDirection + influence, 1));
     market[ticker] = newStock;
 }
 
 //TODO: does not catch exception when market[ticker] returns jackshit
 export function SetTickToStock(market: Portfolio, ticker: string, newTick: number): void {
-    const newStock = ReturnStockCopy(market[ticker]);
+    const newStock = MakeMarketStockCopy(market[ticker]);
     newStock.tick = newTick;
     market[ticker] = newStock;
 }
@@ -268,7 +365,7 @@ function StockSimulationLoop(
     rng: RandomGenerator,
     io: Server,
     ticker: string,
-    market: Portfolio,
+    market: MarketPortfolio,
     dateService: DateService
 ): { clear(): void } {
     return rng.randomInterval(
@@ -279,7 +376,7 @@ function StockSimulationLoop(
                 stock.currPrice,
                 rng,
                 stock.tick,
-                stock.directionInfluence
+                stock.influenceDirection
             );
             const date = dateService.ParseDate();
 
@@ -290,12 +387,12 @@ function StockSimulationLoop(
             );
             const latest = newStockHistory[newStockHistory.length - 1];
 
-            const openPrice = newStockHistory[0].price.close;
-            const delta = latest.price.close - openPrice;
+            const openPrice = newStockHistory[0].close;
+            const delta = latest.close - openPrice;
             const percentage = delta / openPrice;
             const lastDelta = newPrice - currPrice;
 
-            const newStockInfo = ReturnStockCopy(stock);
+            const newStockInfo = MakeMarketStockCopy(stock);
             newStockInfo.currPrice = newPrice;
             newStockInfo.delta = delta;
             newStockInfo.deltaPercentage = percentage;
@@ -331,12 +428,10 @@ function AddNewPriceData(
     if (history.length == 0) {
         newPriceDataAtTime = {
             time: time,
-            price: {
-                open: price,
-                high: price,
-                low: price,
-                close: price
-            }
+            open: price,
+            high: price,
+            low: price,
+            close: price
         };
         history.push(newPriceDataAtTime);
         return history;
@@ -346,24 +441,20 @@ function AddNewPriceData(
         //means we're one day ahead now
         newPriceDataAtTime = {
             time: time,
-            price: {
-                open: price,
-                high: price,
-                low: price,
-                close: price
-            }
+            open: price,
+            high: price,
+            low: price,
+            close: price
         };
         history.push(newPriceDataAtTime);
         return history;
     }
     newPriceDataAtTime = {
         time: time,
-        price: {
-            open: latestEntry.price.open,
-            high: price > latestEntry.price.high ? price : latestEntry.price.high,
-            low: price < latestEntry.price.low ? price : latestEntry.price.low,
-            close: price
-        }
+        open: latestEntry.open,
+        high: price > latestEntry.high ? price : latestEntry.high,
+        low: price < latestEntry.low ? price : latestEntry.low,
+        close: price
     };
     history[history.length - 1] = newPriceDataAtTime;
     return history;
@@ -377,7 +468,7 @@ function AddNewPriceData(
 //     return history;
 // }
 //TODO: I don't like this, but i'm tired of dealing with I/O from file at this point.
-const DefaultMarketPortfolio = function (): Portfolio {
+const DefaultMarketPortfolio = function (): MarketPortfolio {
     const stocks = {};
     stocks['NVDA'] = {
         ticker: 'NVDA',
@@ -479,21 +570,20 @@ const DefaultMarketPortfolio = function (): Portfolio {
         history: []
     };
 
-    return stocks;
+    return { stocks: stocks };
 };
 
-function ReturnStockCopy(stock: Stock): Stock {
+function MakeMarketStockCopy(stock: MarketStock): MarketStock {
     return {
         ticker: stock.ticker,
         name: stock.name,
         currPrice: stock.currPrice,
-        quantity: stock.quantity,
         delta: stock.delta,
         deltaPercentage: stock.deltaPercentage,
         lastDelta: stock.lastDelta,
         tick: stock.tick,
         lastUpdate: stock.lastUpdate,
-        directionInfluence: stock.directionInfluence,
+        influenceDirection: stock.influenceDirection,
         history: stock.history
     };
 }
