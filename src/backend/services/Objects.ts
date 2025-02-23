@@ -25,7 +25,7 @@ export interface RunFile {
     seed: string;
     portfolio?: PlayerPortfolio;
     cash: number;
-    clearance: string[];
+    privileges: string[];
 }
 
 export interface PlayerPortfolio {
@@ -70,6 +70,6 @@ export interface StockGetResponse {
     result: boolean;
     detail: string;
     data?: {
-        portfolio: Portfolio;
+        stocks: Stock[];
     };
 }
