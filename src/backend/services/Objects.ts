@@ -26,6 +26,15 @@ export interface RunFile {
     portfolio?: PlayerPortfolio;
     cash: number;
     privileges: string[];
+    items: Item[];
+}
+
+export interface Item {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    function: (...args: unknown[]) => void;
 }
 
 export interface PlayerPortfolio {
@@ -71,5 +80,18 @@ export interface StockGetResponse {
     detail: string;
     data?: {
         stocks: Stock[];
+    };
+}
+
+export interface ItemOperationResponse {
+    result: boolean;
+    detail: string;
+    data?: {
+        newRemainingCash: number;
+        items: {
+            id: string;
+            name: string;
+            description: string;
+        }[];
     };
 }
