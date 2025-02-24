@@ -297,7 +297,7 @@ function calculateAveragePrice(
     return (priceA * quantityA + priceB * quantityB) / (quantityA + quantityB);
 }
 
-export function InstantiateMarket(): Portfolio {
+export function InstantiateMarket(): MarketPortfolio {
     return DefaultMarketPortfolio();
 }
 
@@ -307,7 +307,7 @@ export function InstantiateMarket(): Portfolio {
 //     return marketPf;
 // }
 
-export function startAllStockSimulation(
+export function StartAllStockSimulation(
     rng: RandomGenerator,
     io: Server,
     market: MarketPortfolio,

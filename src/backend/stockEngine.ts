@@ -13,7 +13,7 @@ import {
     InstantiateMarket,
     SellStock,
     SetTickToStock,
-    startAllStockSimulation
+    StartAllStockSimulation
 } from './services/MarketService';
 import { DateService } from './services/DateService';
 import { RunFile } from './services/Objects';
@@ -43,7 +43,7 @@ let dateService: DateService;
 function startStockEngine(): void {
     dateService = new DateService('2030-01-01');
     // marketSimLoop = startAllStockSimulation(rng, io, market, dateService);
-    startAllStockSimulation(rng, io, market, dateService);
+    StartAllStockSimulation(rng, io, market, dateService);
 }
 
 io.on('connection', (socket) => {
