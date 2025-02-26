@@ -15,9 +15,6 @@ export default function ControlsPanel(): JSX.Element {
                     <ModalContent onClose={() => setPaused(false)} />,
                     document.getElementById('overlay')!
                 )}
-            {/* <div className={popups.popup} id="pause" style={{ display: paused ? 'block' : 'none' }}>
-                something
-            </div> */}
         </div>
     );
 }
@@ -25,7 +22,7 @@ export default function ControlsPanel(): JSX.Element {
 function ModalContent(props: { onClose: () => void }): JSX.Element {
     return (
         <div className={`${popups.popup} modal`}>
-            <div> something</div>
+            <div>The house always controls you...</div>
             <button onClick={props.onClose}>Click me to close</button>
         </div>
     );
