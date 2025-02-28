@@ -4,26 +4,48 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export default function ControlsPanel(): JSX.Element {
-    const [paused, setPaused] = useState<boolean>(false);
+    const [popupContext, setPopupContext] = useState<string>('');
     return (
         <div className={styles.wrapper}>
-            <button onClick={() => setPaused(true)}>Pause</button>
+            <button onClick={() => setPopupContext('options')}>Options</button>
             <button>Help</button>
-            <button>Quit</button>
-            {paused &&
+            <button onClick={() => setPopupContext('quit')}>Quit</button>
+            {popupContext !== '' &&
                 createPortal(
-                    <ModalContent onClose={() => setPaused(false)} />,
+                    <ModalContent context={popupContext} onClose={() => setPopupContext('')} />,
                     document.getElementById('overlay')!
                 )}
         </div>
     );
 }
 
-function ModalContent(props: { onClose: () => void }): JSX.Element {
+function ModalContent(props: { context: string; onClose: () => void }): JSX.Element {
+    let contextElement: JSX.Element;
+    switch (props.context) {
+        case 'quit':
+            contextElement = <QuitCurrentGameContext />;
+            break;
+        case 'options':
+            contextElement = <OptionsContext />;
+            break;
+    }
+
     return (
         <div className={`${popups.popup} modal`}>
-            <div>The house always controls you...</div>
+            {contextElement!}
             <button onClick={props.onClose}>Click me to close</button>
         </div>
     );
+}
+
+function QuitCurrentGameContext(): JSX.Element {
+    return (
+        <div>
+            This current quarter will be counted as complete once you quit. Do you wish to continue?
+        </div>
+    );
+}
+
+function OptionsContext(): JSX.Element {
+    return <div>Options menu</div>;
 }

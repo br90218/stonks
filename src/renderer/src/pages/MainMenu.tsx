@@ -2,9 +2,13 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { PageProp } from './BasicPage';
 import { RetrieveRunFile } from '@renderer/services/BackendUtility';
+import { RunSettings } from './RunSettings';
+import { createPortal } from 'react-dom';
+import { ContextualModal } from '@renderer/components/Modals/Modal';
 
 export function MainMenu(props: PageProp): JSX.Element {
     const [rf, setrf] = useState('');
+    const [isStartingNewRun, setIsStartingNewRun] = useState(false);
 
     useEffect(() => {
         RetrieveRunFile().then((result) => {
@@ -18,9 +22,13 @@ export function MainMenu(props: PageProp): JSX.Element {
         <>
             <h1 className="font_mainTitle">Wall Street Betssss</h1>
             The house always wins...
-            <Link to="/runsettings">
-                <button>New Run</button>
-            </Link>
+            <button
+                onClick={() => {
+                    setIsStartingNewRun(true);
+                }}
+            >
+                New Run
+            </button>
             <div id="continue-run">A save file is detected: {rf}</div>
             <Link to="/settings">
                 <button>Settings</button>
@@ -34,6 +42,15 @@ export function MainMenu(props: PageProp): JSX.Element {
                     <button>new game view</button>
                 </Link>
             </div>
+            {isStartingNewRun &&
+                createPortal(
+                    <ContextualModal context={RunSettingsContext()} />,
+                    document.getElementById('overlay')!
+                )}
         </>
     );
+}
+
+function RunSettingsContext(): JSX.Element {
+    return <RunSettings />;
 }

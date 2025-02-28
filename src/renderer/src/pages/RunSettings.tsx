@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export function RunSettings() {
+export function RunSettings(): JSX.Element {
     const [name, setName] = useState('Warren Buffet');
     const [seed, setSeed] = useState('12345678');
     const navigate = useNavigate();

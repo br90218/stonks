@@ -12,7 +12,7 @@ export function BuyPanel(props: {
     const [playerStockInfoToDisplay, setPlayerStockInfoToDisplay] =
         useState<StockInfo>(EmptyStockInfo);
     const gvCallback = useRef(props.gvCallback);
-    const tickerShown = useRef('NVDA');
+    const tickerShown = useRef('');
 
     useEffect(() => {
         if (props.tickerToShow == props.marketStockInfo?.ticker) {

@@ -1,7 +1,7 @@
 import { Item, RunFile, ItemOperationResponse } from './Objects';
 
 export function BuyItem(runFile: RunFile, itemId: string): ItemOperationResponse {
-    const item = GetItem(itemId);
+    const item = GetItem(ItemsList, itemId);
     if (!item) {
         return {
             result: false,
@@ -40,7 +40,7 @@ export function BuyItem(runFile: RunFile, itemId: string): ItemOperationResponse
 }
 
 export function SellItem(runFile: RunFile, itemId: string): ItemOperationResponse {
-    const item = GetItem(itemId);
+    const item = GetItem(ItemsList, itemId);
     if (!item) {
         return {
             result: false,
@@ -76,8 +76,8 @@ export function SellItem(runFile: RunFile, itemId: string): ItemOperationRespons
     }
 }
 
-export function GetItem(itemId: string): Item {
-    return ItemsList[itemId];
+export function GetItem(itemList: { [id: string]: Item }, itemId: string): Item {
+    return itemList[itemId];
 }
 
 const ItemsList: { [id: string]: Item } = {

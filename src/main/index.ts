@@ -35,8 +35,9 @@ function createWindow(): BrowserWindow {
     mainWindow.on('ready-to-show', () => {
         mainWindow.maximize();
         mainWindow.show();
+        mainWindow.resizable = false;
         //TODO: Debug only, remove this line
-        mainWindow.webContents.openDevTools();
+        // mainWindow.webContents.openDevTools();
     });
 
     mainWindow.webContents.setWindowOpenHandler((details) => {

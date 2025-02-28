@@ -2,7 +2,7 @@ import styles from '@renderer/assets/css/pages/gameview.module.css';
 import { BuyPanel } from '@renderer/components/BuyPanel';
 import { InventoryPanel } from '@renderer/components/InventoryPanel';
 import { NewsFlashPanel } from '@renderer/components/NewsFlashPanel';
-import ControlsPanel from '@renderer/components/Panels/controlspanel';
+import ControlsPanel from '@renderer/components/Panels/ControlsPanel';
 import StatusPanel from '@renderer/components/Panels/StatusPanel';
 import { StockChartPanel } from '@renderer/components/StockChartPanel';
 import { StockInfoPanel } from '@renderer/components/StockInfoPanel';

@@ -81,3 +81,10 @@ export const EmptyStockOperationResponse = (): StockOperationResponse => {
         operatedStock: EmptyStockInfo()
     };
 };
+
+export interface FrontendItem {
+    id: string;
+    name: string;
+    description: string;
+    cost: number;
+}
