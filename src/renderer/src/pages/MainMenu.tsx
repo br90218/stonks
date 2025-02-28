@@ -7,13 +7,13 @@ import { createPortal } from 'react-dom';
 import { ContextualModal } from '@renderer/components/Modals/Modal';
 
 export function MainMenu(props: PageProp): JSX.Element {
-    const [rf, setrf] = useState('');
+    const [runFile, setRunfile] = useState('');
     const [isStartingNewRun, setIsStartingNewRun] = useState(false);
 
     useEffect(() => {
         RetrieveRunFile().then((result) => {
             if (result != null) {
-                setrf(result.name);
+                setRunfile(result.name);
             }
         });
     }, []);
@@ -29,7 +29,7 @@ export function MainMenu(props: PageProp): JSX.Element {
             >
                 New Run
             </button>
-            <div id="continue-run">A save file is detected: {rf}</div>
+            <div id="continue-run">A save file is detected: {runFile}</div>
             <Link to="/settings">
                 <button>Settings</button>
             </Link>

@@ -7,8 +7,12 @@ import StatusPanel from '@renderer/components/Panels/StatusPanel';
 import { StockChartPanel } from '@renderer/components/StockChartPanel';
 import { StockInfoPanel } from '@renderer/components/StockInfoPanel';
 import { CallBackMessage } from '@renderer/data/Interface';
+import { useEffect } from 'react';
 
 export default function GameView(): JSX.Element {
+    useEffect(() => {
+        window.api.startStockSim();
+    }, []);
     return (
         <div className={styles.wrapper}>
             <div className={styles.header}>

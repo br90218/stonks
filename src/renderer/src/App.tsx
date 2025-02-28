@@ -17,7 +17,7 @@ function App(): JSX.Element {
                     <Route path="/mainmenu" element={<MainMenu />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/runsettings" element={<RunSettings />} />
-                    <Route path="/gameview" element={<GameViewOld />} />
+                    <Route path="/gameview" element={<GameView />} />
                     <Route path="/intermission" element={<Intermission />} />
                     <Route path="/gameviewnew" element={<GameView />} />
                 </Routes>

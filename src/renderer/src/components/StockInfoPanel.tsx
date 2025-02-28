@@ -3,6 +3,8 @@ import { StockInfoButton } from './Buttons/StockInfoButton';
 import { useEffect, useState } from 'react';
 import styles from '@renderer/assets/css/stockinfopanel.module.css';
 
+const MARKET_UPDATE_INTERVAL = 1_000;
+
 function StockButtonList(props: {
     stockList: { id: string; stock: StockInfo }[] | undefined;
     gvCallback: (childData: CallBackMessage) => void;
@@ -47,15 +49,14 @@ export function StockInfoPanel(props: {
     gvCallback: (childData: { msgType: string; arg?: string[] }) => void;
 }): JSX.Element {
     const [stockList, setStockList] = useState<{ id: string; stock: StockInfo }[]>([
-        { id: 'NVDA', stock: EmptyStockInfo() },
-        { id: 'NVDA', stock: EmptyStockInfo() },
-        { id: 'NVDA', stock: EmptyStockInfo() },
-        { id: 'NVDA', stock: EmptyStockInfo() },
-        { id: 'NVDA', stock: EmptyStockInfo() },
-        { id: 'NVDA', stock: EmptyStockInfo() },
-        { id: 'NVDA', stock: EmptyStockInfo() },
         { id: 'NVDA', stock: EmptyStockInfo() }
     ]);
+
+    useEffect(() => {
+        const timeout = setTimeout(getNewStockInfos, MARKET_UPDATE_INTERVAL);
+        return (): void => clearTimeout(timeout);
+    }, [stockList]);
+
     useEffect(() => {
         const list: { id: string; stock: StockInfo }[] = [];
         if (!props.market) {
@@ -66,6 +67,29 @@ export function StockInfoPanel(props: {
         });
         setStockList(list);
     }, [props.market]);
+
+    const getNewStockInfos = async (): Promise<void> => {
+        const request = await window.api.getMarketStock();
+        if (request.result) {
+            const list: { id: string; stock: StockInfo }[] = [];
+            request.data.stocks.forEach((item) => {
+                list.push({
+                    id: item.ticker,
+                    stock: {
+                        ticker: item.ticker,
+                        name: item.name,
+                        currPrice: item.currPrice,
+                        delta: item.delta,
+                        deltaPercentage: item.deltaPercentage,
+                        lastDelta: item.lastDelta,
+                        quantity: /*TODO:CHANGE THIS*/ 100_000
+                    }
+                });
+            });
+            setStockList(list);
+        }
+    };
+
     return (
         <div className={styles.wrapper}>
             <StockButtonList stockList={stockList} gvCallback={props.gvCallback} />

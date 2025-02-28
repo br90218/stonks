@@ -36,7 +36,7 @@ export function StockInfoButton(props: {
                 <h2 className={styles.Ticker}>{stock?.ticker}</h2>
                 <div className={styles.Name}>{stock?.name}</div>
                 <div className={`${styles.Price} ${direction}`}>{stock?.currPrice.toFixed(2)}</div>
-                <div>+100%</div>
+                <div>{(stock?.deltaPercentage * 100).toFixed(2)}%</div>
             </div>
         </button>
     );

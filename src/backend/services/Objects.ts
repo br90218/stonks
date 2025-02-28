@@ -3,15 +3,18 @@ export interface Stock {
     name: string;
 }
 
-export interface MarketStock extends Stock {
-    currPrice: number;
-    delta: number;
-    deltaPercentage: number;
-    lastDelta: number;
+export interface MarketStock extends MarketStockSimple {
     tick: number;
     lastUpdate: string;
     influenceDirection: number;
     history: PriceDataAtTime[];
+}
+
+export interface MarketStockSimple extends Stock {
+    currPrice: number;
+    delta: number;
+    deltaPercentage: number;
+    lastDelta: number;
 }
 
 export interface PlayerPosition extends Stock {

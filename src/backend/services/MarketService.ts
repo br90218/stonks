@@ -3,6 +3,7 @@ import { RandomGenerator } from '../RandomGenerator';
 import {
     MarketPortfolio,
     MarketStock,
+    MarketStockSimple,
     PlayerPosition,
     Portfolio,
     PriceDataAtTime,
@@ -17,15 +18,34 @@ export function GetMarketStock(
     marketPortfolio: MarketPortfolio,
     tickers?: string[]
 ): StockGetResponse {
-    const result: MarketStock[] = [];
+    const result: MarketStockSimple[] = [];
 
+    //TODO: maybe we should make parameters so we choose what properties to return 1-by-1.
     if (tickers && tickers.length > 0) {
         tickers.forEach((ticker) => {
-            result.push(marketPortfolio.stocks[ticker]);
+            const stock = marketPortfolio.stocks[ticker];
+            const simplifiedStock: MarketStockSimple = {
+                name: stock.name,
+                ticker: stock.ticker,
+                currPrice: stock.currPrice,
+                delta: stock.delta,
+                lastDelta: stock.lastDelta,
+                deltaPercentage: stock.deltaPercentage
+            };
+            result.push(simplifiedStock);
         });
     } else {
         Object.keys(marketPortfolio.stocks).forEach((ticker) => {
-            result.push(marketPortfolio.stocks[ticker]);
+            const stock = marketPortfolio.stocks[ticker];
+            const simplifiedStock: MarketStockSimple = {
+                name: stock.name,
+                ticker: stock.ticker,
+                currPrice: stock.currPrice,
+                delta: stock.delta,
+                lastDelta: stock.lastDelta,
+                deltaPercentage: stock.deltaPercentage
+            };
+            result.push(simplifiedStock);
         });
     }
     return {
@@ -318,8 +338,7 @@ export function StartAllStockSimulation(
     const stockSimulationLoops: {
         [ticker: string]: { clear(): void };
     } = {};
-
-    Object.keys(market).forEach((ticker) => {
+    Object.keys(market.stocks).forEach((ticker) => {
         stockSimulationLoops[ticker] = StockSimulationLoop(rng, io, ticker, market, dateService);
     });
 
@@ -370,7 +389,7 @@ function StockSimulationLoop(
 ): { clear(): void } {
     return rng.randomInterval(
         () => {
-            const stock = market[ticker];
+            const stock = market.stocks[ticker];
             const currPrice = stock.currPrice;
             const newPrice = GenerateNewPrice(
                 stock.currPrice,
@@ -400,7 +419,7 @@ function StockSimulationLoop(
             newStockInfo.lastUpdate = date;
             newStockInfo.history = newStockHistory;
 
-            market[stock.ticker] = newStockInfo;
+            market.stocks[stock.ticker] = newStockInfo;
             io.emit('message', 'stockinfo', { ticker: stock.ticker, data: newStockInfo });
             io.emit('message', 'stockprice', { ticker: stock.ticker, price: latest });
         },

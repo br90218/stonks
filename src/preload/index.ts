@@ -48,7 +48,7 @@ const api = {
             Number(quantity)
         ]);
     },
-    getMarketStock: async (tickers?: string[]) => {
+    getMarketStock: async (tickers?: string[]): Promise<any> => {
         return await ipcRenderer.invoke('request', 'get-marketStock', tickers);
     },
     getPlayerStock: async (tickers?: string[]) => {
