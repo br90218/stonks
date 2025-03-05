@@ -1,4 +1,4 @@
-# Stonk-balatro
+# Stonks
 
 ## Naming
 
